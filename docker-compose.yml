@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  app:
+    image: safe-job-server
+    container_name: safe-job-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8888:8080"
+    restart: unless-stopped
