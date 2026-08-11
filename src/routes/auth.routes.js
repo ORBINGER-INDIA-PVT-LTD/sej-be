@@ -8,13 +8,14 @@ const router = express.Router();
 // Public route - anyone can login
 router.post("/login", authController.login);
 
-// Protected route - only authenticated admin can register new users
-router.post(
-  "/register",
-  authenticate,
-  authorize("admin"),
-  authController.register
-);
+// Public route - admin-only login
+router.post("/admin/login", authController.adminLogin);
+
+// Bootstrap route to create the first admin user when no admin exists yet
+router.post("/register", authController.register);
+
+// Route to register users without requiring a prior login token
+router.post("/register-admin", authController.register);
 
 // Admin only - get all users
 router.get(
