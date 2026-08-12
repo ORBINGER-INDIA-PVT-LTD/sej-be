@@ -7,27 +7,30 @@ const ToolStatusModel = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      tools_and_tackles_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       tool_name: {
         type: DataTypes.STRING,
         allowNull: false,
       },
       tool_status: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       before_img: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: true,
-        defaultValue: "",
       },
       after_img: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: true,
-        defaultValue: "",
       },
-      tools_and_tackles_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+      tool_checklist: {
+        type: DataTypes.JSON,
+        allowNull: true,
+        defaultValue: [],
       },
     },
     {
@@ -39,7 +42,7 @@ const ToolStatusModel = (sequelize, DataTypes) => {
   ToolStatus.associate = (models) => {
     ToolStatus.belongsTo(models.ToolsAndTackles, {
       foreignKey: "tools_and_tackles_id",
-      as: "toolsAndTackles",
+      as: "tools_and_tackles",
     });
   };
 
@@ -47,4 +50,3 @@ const ToolStatusModel = (sequelize, DataTypes) => {
 };
 
 export default ToolStatusModel;
-

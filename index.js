@@ -55,9 +55,8 @@ const startServer = async () => {
     await db.sequelize.authenticate();
     console.log("==Database connected successfully==");
 
-    // Sync all models - creates tables if they don't exist
-    // await db.sequelize.sync({ alter: true });
-    await db.sequelize.sync();
+    // Sync all models - creates tables and alters columns if they don't exist
+    await db.sequelize.sync({ alter: true });
     console.log("==Database tables synced successfully==");
 
     // Seed default data

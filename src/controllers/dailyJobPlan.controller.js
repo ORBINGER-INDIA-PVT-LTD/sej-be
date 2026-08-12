@@ -131,7 +131,8 @@ const getById = async (req, res) => {
     }
 
     // Employees can only view their own plans, admins can view all
-    if (userRole !== "admin" && plan.user_id !== user_id) {
+    const isAdmin = ["admin", "administrator", "organization"].includes((userRole || "").toLowerCase());
+    if (!isAdmin && plan.user_id !== user_id) {
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -158,7 +159,8 @@ const update = async (req, res) => {
     }
 
     // Employees can only update their own plans, admins can update all
-    if (userRole !== "admin" && plan.user_id !== user_id) {
+    const isAdmin = ["admin", "administrator", "organization"].includes((userRole || "").toLowerCase());
+    if (!isAdmin && plan.user_id !== user_id) {
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -238,7 +240,8 @@ const remove = async (req, res) => {
     }
 
     // Employees can only delete their own plans, admins can delete all
-    if (userRole !== "admin" && plan.user_id !== user_id) {
+    const isAdmin = ["admin", "administrator", "organization"].includes((userRole || "").toLowerCase());
+    if (!isAdmin && plan.user_id !== user_id) {
       return res.status(403).json({ message: "Access denied" });
     }
 

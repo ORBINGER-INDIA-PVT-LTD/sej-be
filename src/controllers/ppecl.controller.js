@@ -1,38 +1,17 @@
 import db from "../models/index.js";
 
-const ToolsAndTackles = db.ToolsAndTackles;
-const ToolStatus = db.ToolStatus;
+const Ppecl = db.Ppecl;
+const PpeclStatus = db.PpeclStatus;
 const User = db.User;
 
-// Create a new tools and tackles checklist
+// Create a new PPECL checklist
 const create = async (req, res) => {
   try {
-    const {
-      permit_no,
-      date,
-      type_of_work,
-      name_of_supervisor,
-      sop_number,
-      job_description,
-      status,
-      toolTackles,
-    } = req.body;
-
+    const { toolTackles } = req.body;
     const user_id = req.user.id;
 
-    const finalPermitNo = permit_no || `PERMIT-${Date.now()}`;
-
     // Create parent record
-    const record = await ToolsAndTackles.create({
-      permit_no: finalPermitNo,
-      date: date || new Date(),
-      type_of_work: type_of_work || "Tools and Tackles Checklist",
-      name_of_supervisor: name_of_supervisor || req.user.emp_name || "Supervisor",
-      sop_number: sop_number || "SOP-001",
-      job_description: job_description || "Tools & Tackles Checklist Points",
-      status: status || "Pending",
-      user_id,
-    });
+    const record = await Ppecl.create({ user_id });
 
     // Parse and create child records if toolTackles is present
     let parsedTools = [];
@@ -48,29 +27,28 @@ const create = async (req, res) => {
 
     if (parsedTools && parsedTools.length > 0) {
       const statusRecords = parsedTools.map((tool) => ({
-        tools_and_tackles_id: record.id,
-        tool_name: tool.toolName || "Unknown Tool",
-        tool_status: "Pending", // Default overall status
+        ppecl_id: record.id,
+        tool_name: tool.toolName || "Unknown Item",
         tool_checklist: tool.toolChecklist || [],
       }));
 
-      await ToolStatus.bulkCreate(statusRecords);
+      await PpeclStatus.bulkCreate(statusRecords);
     }
 
     // Retrieve full created checklist with association
-    const createdChecklist = await ToolsAndTackles.findByPk(record.id, {
+    const createdChecklist = await Ppecl.findByPk(record.id, {
       include: [
-        { model: ToolStatus, as: "tools_status" },
+        { model: PpeclStatus, as: "ppecl_status" },
         { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email"] },
       ],
     });
 
     return res.status(201).json({
-      message: "Tools and tackles checklist created successfully",
+      message: "PPECL checklist created successfully",
       data: createdChecklist,
     });
   } catch (error) {
-    console.error("Error creating tools and tackles checklist:", error);
+    console.error("Error creating ppecl checklist:", error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -79,17 +57,17 @@ const create = async (req, res) => {
 const getMyRecords = async (req, res) => {
   try {
     const user_id = req.user.id;
-    const records = await ToolsAndTackles.findAll({
+    const records = await Ppecl.findAll({
       where: { user_id },
       include: [
-        { model: ToolStatus, as: "tools_status" },
+        { model: PpeclStatus, as: "ppecl_status" },
         { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email"] },
       ],
       order: [["createdAt", "DESC"]],
     });
 
     return res.status(200).json({
-      message: "Tools and tackles checklists fetched successfully",
+      message: "PPECL checklists fetched successfully",
       data: records,
     });
   } catch (error) {
@@ -101,10 +79,8 @@ const getMyRecords = async (req, res) => {
 const getAll = async (req, res) => {
   try {
     const userRole = req.user.roleName || "";
-    // Admin check
     const isAdmin = ["admin", "administrator", "organization"].includes(userRole.toLowerCase());
     
-    // In case roleName wasn't loaded:
     let isRoleAdmin = false;
     if (req.user.role) {
       const userRoleRecord = await db.Role.findByPk(req.user.role);
@@ -120,16 +96,16 @@ const getAll = async (req, res) => {
       return res.status(403).json({ message: "Access denied" });
     }
 
-    const records = await ToolsAndTackles.findAll({
+    const records = await Ppecl.findAll({
       include: [
-        { model: ToolStatus, as: "tools_status" },
+        { model: PpeclStatus, as: "ppecl_status" },
         { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email"] },
       ],
       order: [["createdAt", "DESC"]],
     });
 
     return res.status(200).json({
-      message: "All tools and tackles checklists fetched successfully",
+      message: "All PPECL fetched successfully",
       data: records,
     });
   } catch (error) {
@@ -145,9 +121,9 @@ const getById = async (req, res) => {
     const userRole = req.user.roleName || "";
     const isAdmin = ["admin", "administrator", "organization"].includes(userRole.toLowerCase());
 
-    const record = await ToolsAndTackles.findByPk(id, {
+    const record = await Ppecl.findByPk(id, {
       include: [
-        { model: ToolStatus, as: "tools_status" },
+        { model: PpeclStatus, as: "ppecl_status" },
         { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email"] },
       ],
     });
@@ -161,7 +137,7 @@ const getById = async (req, res) => {
     }
 
     return res.status(200).json({
-      message: "Tools and tackles checklist fetched successfully",
+      message: "PPECL checklist fetched successfully",
       data: record,
     });
   } catch (error) {
@@ -178,7 +154,7 @@ const update = async (req, res) => {
     const userRole = req.user.roleName || "";
     const isAdmin = ["admin", "administrator", "organization"].includes(userRole.toLowerCase());
 
-    const record = await ToolsAndTackles.findByPk(id);
+    const record = await Ppecl.findByPk(id);
     if (!record) {
       return res.status(404).json({ message: "Record not found" });
     }
@@ -190,7 +166,7 @@ const update = async (req, res) => {
     await record.update({ updatedAt: new Date() });
 
     // Remove old child statuses
-    await ToolStatus.destroy({ where: { tools_and_tackles_id: id } });
+    await PpeclStatus.destroy({ where: { ppecl_id: id } });
 
     // Create updated child statuses
     let parsedTools = [];
@@ -206,16 +182,15 @@ const update = async (req, res) => {
 
     if (parsedTools && parsedTools.length > 0) {
       const statusRecords = parsedTools.map((tool) => ({
-        tools_and_tackles_id: id,
-        tool_name: tool.toolName || "Unknown Tool",
-        tool_status: "Pending",
+        ppecl_id: id,
+        tool_name: tool.toolName || "Unknown Item",
         tool_checklist: tool.toolChecklist || tool.points || [],
       }));
 
-      await ToolStatus.bulkCreate(statusRecords);
+      await PpeclStatus.bulkCreate(statusRecords);
     }
 
-    return res.status(200).json({ message: "Checklist updated successfully" });
+    return res.status(200).json({ message: "PPECL updated successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -229,7 +204,7 @@ const remove = async (req, res) => {
     const userRole = req.user.roleName || "";
     const isAdmin = ["admin", "administrator", "organization"].includes(userRole.toLowerCase());
 
-    const record = await ToolsAndTackles.findByPk(id);
+    const record = await Ppecl.findByPk(id);
     if (!record) {
       return res.status(404).json({ message: "Record not found" });
     }
@@ -239,12 +214,12 @@ const remove = async (req, res) => {
     }
 
     // Delete children
-    await ToolStatus.destroy({ where: { tools_and_tackles_id: id } });
+    await PpeclStatus.destroy({ where: { ppecl_id: id } });
     
     // Delete parent
     await record.destroy();
 
-    return res.status(200).json({ message: "Checklist deleted successfully" });
+    return res.status(200).json({ message: "PPECL deleted successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

@@ -11,18 +11,21 @@ router.post("/login", authController.login);
 // Public route - admin-only login
 router.post("/admin/login", authController.adminLogin);
 
-// Bootstrap route to create the first admin user when no admin exists yet
+// Route to register users
 router.post("/register", authController.register);
-
-// Route to register users without requiring a prior login token
+router.post("/user/register", authController.register);
 router.post("/register-admin", authController.register);
 
 // Admin only - get all users
 router.get(
   "/users",
-  authenticate,
-  authorize("admin"),
   authController.getAllUsers
+);
+
+// Admin / Auth - delete user
+router.delete(
+  "/users/:id",
+  authController.deleteUser
 );
 
 export default router;

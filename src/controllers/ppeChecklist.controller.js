@@ -396,7 +396,8 @@ const getById = async (req, res) => {
     }
 
     // Employees can only view their own records, admins can view all
-    if (userRole !== "admin" && record.user_id !== user_id) {
+    const isAdmin = ["admin", "administrator", "organization"].includes((userRole || "").toLowerCase());
+    if (!isAdmin && record.user_id !== user_id) {
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -425,7 +426,8 @@ const update = async (req, res) => {
     }
 
     // Check ownership (employees can only update their own)
-    if (userRole !== "admin" && record.user_id !== user_id) {
+    const isAdmin = ["admin", "administrator", "organization"].includes((userRole || "").toLowerCase());
+    if (!isAdmin && record.user_id !== user_id) {
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -604,7 +606,8 @@ const partialUpdate = async (req, res) => {
     }
 
     // Check ownership
-    if (userRole !== "admin" && record.user_id !== user_id) {
+    const isAdmin = ["admin", "administrator", "organization"].includes((userRole || "").toLowerCase());
+    if (!isAdmin && record.user_id !== user_id) {
       return res.status(403).json({ message: "Access denied" });
     }
 
@@ -720,7 +723,8 @@ const remove = async (req, res) => {
     }
 
     // Check ownership
-    if (userRole !== "admin" && record.user_id !== user_id) {
+    const isAdmin = ["admin", "administrator", "organization"].includes((userRole || "").toLowerCase());
+    if (!isAdmin && record.user_id !== user_id) {
       return res.status(403).json({ message: "Access denied" });
     }
 

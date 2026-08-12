@@ -26,17 +26,7 @@ export const upload = multer({
   limits: { fileSize: 1048576 }, // 1 mb in bytes
 });
 
-// For tools-and-tackles: multiple before/after images per tool (same field names, multiple files)
-export const uploadToolsAndTacklesImages = multer({
-  storage,
-  fileFilter,
-  limits: { fileSize: 1048576 }, // 1 mb
-}).fields([
-  { name: "before_imgs", maxCount: 50 },
-  { name: "after_imgs", maxCount: 50 },
-]);
-
-// For tools-and-tackles: multiple before/after images per tool (same field names, multiple files)
+// For PPE checklist items: multiple before/after images per item
 export const ppeChecklistItemImageFields = multer({
   storage,
   fileFilter,

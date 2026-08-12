@@ -2,41 +2,28 @@ import express from "express";
 import toolsAndTacklesController from "../controllers/toolsAndTackles.controller.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { authorize } from "../middlewares/authorize.js";
-import { uploadToolsAndTacklesImages } from "../middlewares/multer.middleware.js";
 
 const router = express.Router();
 
-// All routes require authentication
+// Require auth
 router.use(authenticate);
 
-// Create/update use form-data (multipart) for before_imgs + after_imgs
-router.post(
-  "/",
-  authorize("employee", "admin"),
-  uploadToolsAndTacklesImages,
-  toolsAndTacklesController.create
-);
+// Create checklist
+router.post("/", authorize("employee", "admin"), toolsAndTacklesController.create);
+
+// Get my checklists
 router.get("/my-records", authorize("employee", "admin"), toolsAndTacklesController.getMyRecords);
 
-// Admin only - get all records from all employees
+// Admin only - get all records
 router.get("/all", authorize("admin"), toolsAndTacklesController.getAll);
 
-// Both employee and admin can access (with ownership check in controller)
+// Get single record
 router.get("/:id", authorize("employee", "admin"), toolsAndTacklesController.getById);
-router.put(
-  "/:id",
-  authorize("employee", "admin"),
-  uploadToolsAndTacklesImages,
-  toolsAndTacklesController.update
-);
-// PATCH: update only status and/or after_imgs (form-data)
-router.patch(
-  "/:id",
-  authorize("employee", "admin"),
-  uploadToolsAndTacklesImages,
-  toolsAndTacklesController.partialUpdate
-);
+
+// Update single record
+router.put("/:id", authorize("employee", "admin"), toolsAndTacklesController.update);
+
+// Delete single record
 router.delete("/:id", authorize("employee", "admin"), toolsAndTacklesController.remove);
 
 export default router;
-

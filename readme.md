@@ -97,17 +97,7 @@ User (1) ──────< DailyJobPlan (Many)
 
 Restart your server and the new tables will be created automatically! 🚀
 
-## Tools and Tackles
-
-I'll create the Tools and Tackles feature with the ToolStatus table (for the tool_name/tool_status array). Let me set this up:
-
-[9 tools called]
-
-Done! Here's everything I created:
-
-## Files Created
-
-### 1. `src/models/toolsAndTackles.model.js`
+## PPE Check list
 
 | Field              | Type     | Notes                       |
 | ------------------ | -------- | --------------------------- |
@@ -119,79 +109,6 @@ Done! Here's everything I created:
 | sop_number         | STRING   | Required                    |
 | job_description    | TEXT     | Required                    |
 | user_id            | INTEGER  | Foreign key to users        |
-
-### 2. `src/models/toolStatus.model.js`
-
-| Field                | Type    | Notes                            |
-| -------------------- | ------- | -------------------------------- |
-| id                   | INTEGER | Primary key, auto-increment      |
-| tool_name            | STRING  | Required                         |
-| tool_status          | STRING  | Required                         |
-| tools_and_tackles_id | INTEGER | Foreign key to tools_and_tackles |
-
-### 3. `src/controllers/toolsAndTackles.controller.js`
-
-- `create` - Create new record with tool statuses
-- `getMyRecords` - Get logged-in employee's records
-- `getAll` - Get all records (admin only)
-- `getById` - Get single record by ID
-- `update` - Update record and tool statuses
-- `remove` - Delete record and its tool statuses
-
-### 4. `src/routes/toolsAndTackles.routes.js`
-
----
-
-## API Endpoints
-
-| Method | Endpoint                            | Access                | Description       |
-| ------ | ----------------------------------- | --------------------- | ----------------- |
-| POST   | `/api/tools-and-tackles`            | Employee, Admin       | Create new record |
-| GET    | `/api/tools-and-tackles/my-records` | Employee, Admin       | Get own records   |
-| GET    | `/api/tools-and-tackles/all`        | Admin only            | Get all records   |
-| GET    | `/api/tools-and-tackles/:id`        | Employee (own), Admin | Get by ID         |
-| PUT    | `/api/tools-and-tackles/:id`        | Employee (own), Admin | Update record     |
-| DELETE | `/api/tools-and-tackles/:id`        | Employee (own), Admin | Delete record     |
-
----
-
-## Example Request - Create Tools and Tackles
-
-```json
-POST /api/tools-and-tackles
-Headers: Authorization: Bearer <employee_token>
-
-{
-  "permit_no": "TAT-2026-001",
-  "date": "2026-01-06",
-  "type_of_work": "Mechanical Maintenance",
-  "name_of_supervisor": "Jane Doe",
-  "sop_number": "SOP-MM-005",
-  "job_description": "Pump maintenance in boiler room",
-  "tools_status": [
-    {
-      "tool_name": "Torque Wrench",
-      "tool_status": "Good"
-    },
-    {
-      "tool_name": "Safety Harness",
-      "tool_status": "Needs Inspection"
-    },
-    {
-      "tool_name": "Multimeter",
-      "tool_status": "Good"
-    }
-  ]
-}
-```
-
-## Database Relations
-
-```
-User (1) ──────< ToolsAndTackles (Many)
-                        │
-                        └────< ToolStatus (Many)
-```
 
 Restart your server and the new tables will be created automatically! 🚀
 

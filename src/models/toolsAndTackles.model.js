@@ -7,10 +7,13 @@ const ToolsAndTacklesModel = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      user_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       permit_no: {
         type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
+        allowNull: true,
       },
       date: {
         type: DataTypes.DATEONLY,
@@ -19,28 +22,24 @@ const ToolsAndTacklesModel = (sequelize, DataTypes) => {
       },
       type_of_work: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       name_of_supervisor: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       sop_number: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       job_description: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
       },
       status: {
         type: DataTypes.STRING,
         allowNull: true,
-        defaultValue: "open",
-      },
-      user_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+        defaultValue: "Pending",
       },
     },
     {
