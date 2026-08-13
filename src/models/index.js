@@ -15,6 +15,9 @@ import PpeclModel from "./ppecl.model.js";
 import PpeclStatusModel from "./ppeclStatus.model.js";
 import ToolsListModel from "./toolsList.model.js";
 import ToolsListItemModel from "./toolsListItem.model.js";
+import PpeInspectionModel from "./ppeInspection.model.js";
+import PpeInspectionItemModel from "./ppeInspectionItem.model.js";
+import PpeInspectionEmployeeModel from "./ppeInspectionEmployee.model.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -74,6 +77,9 @@ db.Ppecl = PpeclModel(sequelize, Sequelize);
 db.PpeclStatus = PpeclStatusModel(sequelize, Sequelize);
 db.ToolsList = ToolsListModel(sequelize, Sequelize);
 db.ToolsListItem = ToolsListItemModel(sequelize, Sequelize);
+db.PpeInspection = PpeInspectionModel(sequelize, Sequelize);
+db.PpeInspectionEmployee = PpeInspectionEmployeeModel(sequelize, Sequelize);
+db.PpeInspectionItem = PpeInspectionItemModel(sequelize, Sequelize);
 
 // Associations
 Object.keys(db).forEach((modelName) => {

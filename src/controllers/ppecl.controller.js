@@ -82,17 +82,22 @@ const getAll = async (req, res) => {
     const isAdmin = ["admin", "administrator", "organization"].includes(userRole.toLowerCase());
     
     let isRoleAdmin = false;
+    let isRoleEmployee = false;
     if (req.user.role) {
       const userRoleRecord = await db.Role.findByPk(req.user.role);
       if (userRoleRecord) {
         const name = (userRoleRecord.role_name || "").toLowerCase();
         if (["admin", "administrator", "organization"].includes(name)) {
           isRoleAdmin = true;
+        } else if (["employee", "incharge"].includes(name)) {
+          isRoleEmployee = true;
         }
       }
     }
 
-    if (!isAdmin && !isRoleAdmin) {
+    const isEmployee = ["employee", "incharge"].includes(userRole.toLowerCase());
+
+    if (!isAdmin && !isRoleAdmin && !isEmployee && !isRoleEmployee) {
       return res.status(403).json({ message: "Access denied" });
     }
 

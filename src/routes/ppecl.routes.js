@@ -14,8 +14,8 @@ router.post("/", authorize("employee", "admin"), ppeclController.create);
 // Get my checklists
 router.get("/my-records", authorize("employee", "admin"), ppeclController.getMyRecords);
 
-// Admin only - get all records
-router.get("/all", authorize("admin"), ppeclController.getAll);
+// Admin and Employee - get all records
+router.get("/all", authorize("employee", "admin"), ppeclController.getAll);
 
 // Get single record
 router.get("/:id", authorize("employee", "admin"), ppeclController.getById);
