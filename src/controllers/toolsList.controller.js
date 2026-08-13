@@ -1,95 +1,93 @@
 import db from "../models/index.js";
 
-const ToolsAndTackles = db.ToolsAndTackles;
-const ToolStatus = db.ToolStatus;
+const ToolsList = db.ToolsList;
+const ToolsListItem = db.ToolsListItem;
 const User = db.User;
 
-// Create a new tools and tackles checklist
+// Create new ToolsList entry
 const create = async (req, res) => {
   try {
-    const {
-      permit_no,
-      date,
-      type_of_work,
-      name_of_supervisor,
-      sop_number,
-      job_description,
-      status,
-      toolTackles,
+    const { 
+      permitNumber, 
+      date, 
+      typeOfWork, 
+      nameOfSupervisor, 
+      sopNumber, 
+      jobDescription, 
+      tools,
+      employeeId
     } = req.body;
-
     const user_id = req.user.id;
 
-    const finalPermitNo = permit_no || `PERMIT-${Date.now()}`;
-
     // Create parent record
-    const record = await ToolsAndTackles.create({
-      permit_no: finalPermitNo,
-      date: date || new Date(),
-      type_of_work: type_of_work || "Tools and Tackles Checklist",
-      name_of_supervisor: name_of_supervisor || req.user.emp_name || "Supervisor",
-      sop_number: sop_number || "SOP-001",
-      job_description: job_description || "Tools & Tackles Checklist Points",
-      status: status || "Pending",
+    const record = await ToolsList.create({
       user_id,
+      employee_id: employeeId,
+      permit_number: permitNumber,
+      date,
+      type_of_work: typeOfWork,
+      name_of_supervisor: nameOfSupervisor,
+      sop_number: sopNumber,
+      job_description: jobDescription
     });
 
-    // Parse and create child records if toolTackles is present
+    // Create child records if tools are present
     let parsedTools = [];
-    if (typeof toolTackles === "string") {
+    if (typeof tools === "string") {
       try {
-        parsedTools = JSON.parse(toolTackles);
+        parsedTools = JSON.parse(tools);
       } catch (err) {
         parsedTools = [];
       }
-    } else if (Array.isArray(toolTackles)) {
-      parsedTools = toolTackles;
+    } else if (Array.isArray(tools)) {
+      parsedTools = tools;
     }
 
     if (parsedTools && parsedTools.length > 0) {
-      const statusRecords = parsedTools.map((tool) => ({
-        tools_and_tackles_id: record.id,
-        tool_name: tool.toolName || "Unknown Tool",
-        tool_status: "Pending", // Default overall status
-        tool_checklist: tool.toolChecklist || [],
+      const items = parsedTools.map((t) => ({
+        tools_list_id: record.id,
+        tool_name: t.toolName || "Unknown Tool",
+        checklist_points: t.checklistPoints || [],
+        other: t.other || "",
+        description: t.description || "",
+        status: t.status || ""
       }));
 
-      await ToolStatus.bulkCreate(statusRecords);
+      await ToolsListItem.bulkCreate(items);
     }
 
-    // Retrieve full created checklist with association
-    const createdChecklist = await ToolsAndTackles.findByPk(record.id, {
+    const createdRecord = await ToolsList.findByPk(record.id, {
       include: [
-        { model: ToolStatus, as: "tools_status" },
+        { model: ToolsListItem, as: "tools" },
         { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email"] },
       ],
     });
 
     return res.status(201).json({
-      message: "Tools and tackles checklist created successfully",
-      data: createdChecklist,
+      message: "ToolsList record created successfully",
+      data: createdRecord,
     });
   } catch (error) {
-    console.error("Error creating tools and tackles checklist:", error);
+    console.error("Error creating ToolsList:", error);
     return res.status(500).json({ message: error.message });
   }
 };
 
-// Get my checklists
+// Get current user's records
 const getMyRecords = async (req, res) => {
   try {
     const user_id = req.user.id;
-    const records = await ToolsAndTackles.findAll({
+    const records = await ToolsList.findAll({
       where: { user_id },
       include: [
-        { model: ToolStatus, as: "tools_status" },
+        { model: ToolsListItem, as: "tools" },
         { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email"] },
       ],
       order: [["createdAt", "DESC"]],
     });
 
     return res.status(200).json({
-      message: "Tools and tackles checklists fetched successfully",
+      message: "ToolsList records fetched successfully",
       data: records,
     });
   } catch (error) {
@@ -97,44 +95,37 @@ const getMyRecords = async (req, res) => {
   }
 };
 
-// Get all checklists (Admin)
+// Get all records (Admin)
 const getAll = async (req, res) => {
   try {
     const userRole = req.user.roleName || "";
-    // Admin check
     const isAdmin = ["admin", "administrator", "organization"].includes(userRole.toLowerCase());
-    
-    // In case roleName wasn't loaded:
+
     let isRoleAdmin = false;
-    let isRoleEmployee = false;
     if (req.user.role) {
       const userRoleRecord = await db.Role.findByPk(req.user.role);
       if (userRoleRecord) {
         const name = (userRoleRecord.role_name || "").toLowerCase();
         if (["admin", "administrator", "organization"].includes(name)) {
           isRoleAdmin = true;
-        } else if (["employee", "incharge"].includes(name)) {
-          isRoleEmployee = true;
         }
       }
     }
 
-    const isEmployee = ["employee", "incharge"].includes(userRole.toLowerCase());
-
-    if (!isAdmin && !isRoleAdmin && !isEmployee && !isRoleEmployee) {
+    if (!isAdmin && !isRoleAdmin) {
       return res.status(403).json({ message: "Access denied" });
     }
 
-    const records = await ToolsAndTackles.findAll({
+    const records = await ToolsList.findAll({
       include: [
-        { model: ToolStatus, as: "tools_status" },
+        { model: ToolsListItem, as: "tools" },
         { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email"] },
       ],
       order: [["createdAt", "DESC"]],
     });
 
     return res.status(200).json({
-      message: "All tools and tackles checklists fetched successfully",
+      message: "All ToolsList records fetched successfully",
       data: records,
     });
   } catch (error) {
@@ -142,7 +133,7 @@ const getAll = async (req, res) => {
   }
 };
 
-// Get single checklist by ID
+// Get single record by ID
 const getById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -150,9 +141,9 @@ const getById = async (req, res) => {
     const userRole = req.user.roleName || "";
     const isAdmin = ["admin", "administrator", "organization"].includes(userRole.toLowerCase());
 
-    const record = await ToolsAndTackles.findByPk(id, {
+    const record = await ToolsList.findByPk(id, {
       include: [
-        { model: ToolStatus, as: "tools_status" },
+        { model: ToolsListItem, as: "tools" },
         { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email"] },
       ],
     });
@@ -166,7 +157,7 @@ const getById = async (req, res) => {
     }
 
     return res.status(200).json({
-      message: "Tools and tackles checklist fetched successfully",
+      message: "ToolsList record fetched successfully",
       data: record,
     });
   } catch (error) {
@@ -174,16 +165,25 @@ const getById = async (req, res) => {
   }
 };
 
-// Update checklist
+// Update record
 const update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { toolTackles } = req.body;
+    const { 
+      permitNumber, 
+      date, 
+      typeOfWork, 
+      nameOfSupervisor, 
+      sopNumber, 
+      jobDescription, 
+      tools,
+      employeeId
+    } = req.body;
     const user_id = req.user.id;
     const userRole = req.user.roleName || "";
     const isAdmin = ["admin", "administrator", "organization"].includes(userRole.toLowerCase());
 
-    const record = await ToolsAndTackles.findByPk(id);
+    const record = await ToolsList.findByPk(id);
     if (!record) {
       return res.status(404).json({ message: "Record not found" });
     }
@@ -192,41 +192,52 @@ const update = async (req, res) => {
       return res.status(403).json({ message: "Access denied" });
     }
 
-    await record.update({ updatedAt: new Date() });
+    await record.update({
+      employee_id: employeeId,
+      permit_number: permitNumber,
+      date,
+      type_of_work: typeOfWork,
+      name_of_supervisor: nameOfSupervisor,
+      sop_number: sopNumber,
+      job_description: jobDescription,
+      updatedAt: new Date()
+    });
 
-    // Remove old child statuses
-    await ToolStatus.destroy({ where: { tools_and_tackles_id: id } });
+    // Remove old child records
+    await ToolsListItem.destroy({ where: { tools_list_id: id } });
 
-    // Create updated child statuses
+    // Create updated child records
     let parsedTools = [];
-    if (typeof toolTackles === "string") {
+    if (typeof tools === "string") {
       try {
-        parsedTools = JSON.parse(toolTackles);
+        parsedTools = JSON.parse(tools);
       } catch (err) {
         parsedTools = [];
       }
-    } else if (Array.isArray(toolTackles)) {
-      parsedTools = toolTackles;
+    } else if (Array.isArray(tools)) {
+      parsedTools = tools;
     }
 
     if (parsedTools && parsedTools.length > 0) {
-      const statusRecords = parsedTools.map((tool) => ({
-        tools_and_tackles_id: id,
-        tool_name: tool.toolName || "Unknown Tool",
-        tool_status: "Pending",
-        tool_checklist: tool.toolChecklist || tool.points || [],
+      const items = parsedTools.map((t) => ({
+        tools_list_id: id,
+        tool_name: t.toolName || "Unknown Tool",
+        checklist_points: t.checklistPoints || t.checklist_points || [],
+        other: t.other || "",
+        description: t.description || "",
+        status: t.status || ""
       }));
 
-      await ToolStatus.bulkCreate(statusRecords);
+      await ToolsListItem.bulkCreate(items);
     }
 
-    return res.status(200).json({ message: "Checklist updated successfully" });
+    return res.status(200).json({ message: "ToolsList record updated successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
 
-// Delete a checklist
+// Delete record
 const remove = async (req, res) => {
   try {
     const { id } = req.params;
@@ -234,7 +245,7 @@ const remove = async (req, res) => {
     const userRole = req.user.roleName || "";
     const isAdmin = ["admin", "administrator", "organization"].includes(userRole.toLowerCase());
 
-    const record = await ToolsAndTackles.findByPk(id);
+    const record = await ToolsList.findByPk(id);
     if (!record) {
       return res.status(404).json({ message: "Record not found" });
     }
@@ -244,12 +255,12 @@ const remove = async (req, res) => {
     }
 
     // Delete children
-    await ToolStatus.destroy({ where: { tools_and_tackles_id: id } });
+    await ToolsListItem.destroy({ where: { tools_list_id: id } });
     
     // Delete parent
     await record.destroy();
 
-    return res.status(200).json({ message: "Checklist deleted successfully" });
+    return res.status(200).json({ message: "ToolsList record deleted successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

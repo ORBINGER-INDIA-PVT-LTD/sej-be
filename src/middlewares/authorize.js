@@ -19,9 +19,13 @@ export const authorize = (...allowedRoles) => {
 
       // Treat 'administrator' and 'organization' as equivalent to 'admin'
       const isAdminRole = ["admin", "administrator", "organization"].includes(normalizedUserRole);
+      // Treat 'incharge' as equivalent to 'employee'
+      const isEmployeeRole = ["employee", "incharge"].includes(normalizedUserRole);
+      
       const isAllowed =
         normalizedAllowed.includes(normalizedUserRole) ||
-        (isAdminRole && normalizedAllowed.includes("admin"));
+        (isAdminRole && normalizedAllowed.includes("admin")) ||
+        (isEmployeeRole && normalizedAllowed.includes("employee"));
 
       if (!roleName || !isAllowed) {
         return res.status(403).json({ message: "Access denied" });

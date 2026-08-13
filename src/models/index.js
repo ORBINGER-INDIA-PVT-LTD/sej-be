@@ -13,6 +13,8 @@ import ToolsAndTacklesModel from "./toolsAndTackles.model.js";
 import ToolStatusModel from "./toolStatus.model.js";
 import PpeclModel from "./ppecl.model.js";
 import PpeclStatusModel from "./ppeclStatus.model.js";
+import ToolsListModel from "./toolsList.model.js";
+import ToolsListItemModel from "./toolsListItem.model.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -70,6 +72,8 @@ db.ToolsAndTackles = ToolsAndTacklesModel(sequelize, Sequelize);
 db.ToolStatus = ToolStatusModel(sequelize, Sequelize);
 db.Ppecl = PpeclModel(sequelize, Sequelize);
 db.PpeclStatus = PpeclStatusModel(sequelize, Sequelize);
+db.ToolsList = ToolsListModel(sequelize, Sequelize);
+db.ToolsListItem = ToolsListItemModel(sequelize, Sequelize);
 
 // Associations
 Object.keys(db).forEach((modelName) => {

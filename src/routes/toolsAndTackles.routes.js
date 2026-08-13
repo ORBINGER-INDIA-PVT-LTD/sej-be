@@ -14,8 +14,8 @@ router.post("/", authorize("employee", "admin"), toolsAndTacklesController.creat
 // Get my checklists
 router.get("/my-records", authorize("employee", "admin"), toolsAndTacklesController.getMyRecords);
 
-// Admin only - get all records
-router.get("/all", authorize("admin"), toolsAndTacklesController.getAll);
+// Admin & Employee - get all records (templates)
+router.get("/all", authorize("employee", "admin"), toolsAndTacklesController.getAll);
 
 // Get single record
 router.get("/:id", authorize("employee", "admin"), toolsAndTacklesController.getById);

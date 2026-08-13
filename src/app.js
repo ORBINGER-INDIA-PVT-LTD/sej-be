@@ -9,6 +9,7 @@ import employeeRoutes from "../src/routes/employee.routes.js";
 import organizationRoutes from "../src/routes/organization.routes.js";
 import toolsAndTacklesRoutes from "../src/routes/toolsAndTackles.routes.js";
 import ppeclRoutes from "../src/routes/ppecl.routes.js";
+import toolsListRoutes from "../src/routes/toolsList.routes.js";
 
 dotenv.config();
 
@@ -29,5 +30,6 @@ app.use("/api/employees", employeeRoutes);
 app.use("/api/organization", organizationRoutes);
 app.use("/api/tools-and-tackles", toolsAndTacklesRoutes);
 app.use("/api/ppecl", ppeclRoutes);
+app.use("/api/tools-list", toolsListRoutes);
 
 export { app };
