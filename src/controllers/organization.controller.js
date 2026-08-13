@@ -143,3 +143,69 @@ export const getAllOrganizations = async (req, res) => {
     });
   }
 };
+
+export const updateOrganization = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { OrgName, VendorCode, OrgAddress, email, contactNumber, password } = req.body;
+
+    const org = await Organization.findByPk(id);
+    if (!org) {
+      return res.status(404).json({ message: "Organization not found" });
+    }
+
+    if (email && email !== org.email) {
+      const existingEmail = await Organization.findOne({ where: { email } });
+      if (existingEmail) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
+      org.email = email;
+    }
+
+    if (VendorCode && VendorCode !== org.VendorCode) {
+      const existingVendor = await Organization.findOne({ where: { VendorCode } });
+      if (existingVendor) {
+        return res.status(400).json({ message: "VendorCode already exists" });
+      }
+      org.VendorCode = VendorCode;
+    }
+
+    if (OrgName) org.OrgName = OrgName;
+    if (OrgAddress) org.OrgAddress = OrgAddress;
+    if (contactNumber) org.contactNumber = contactNumber;
+    if (password) org.password = password;
+
+    if (req.file) {
+      const uploadResult = await uploadToS3(req.file, "logos");
+      if (uploadResult.status) {
+        org.OrgLogo = uploadResult.url;
+      } else {
+        return res.status(500).json({ message: "Failed to upload Organization Logo to S3" });
+      }
+    }
+
+    await org.save();
+
+    return res.status(200).json({
+      message: "Organization updated successfully",
+      data: {
+        id: org.id,
+        OrgName: org.OrgName,
+        VendorCode: org.VendorCode,
+        OrgLogo: org.OrgLogo,
+        OrgAddress: org.OrgAddress,
+        email: org.email,
+        contactNumber: org.contactNumber,
+        role: org.role,
+        updatedAt: org.updatedAt,
+      }
+    });
+
+  } catch (err) {
+    console.error("Org update error:", err);
+    return res.status(500).json({
+      message: "Internal server error occurred during organization update",
+      error: err.message,
+    });
+  }
+};
