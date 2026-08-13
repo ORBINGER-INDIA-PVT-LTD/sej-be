@@ -14,8 +14,11 @@ router.post("/", authorize("employee", "admin"), toolsListController.create);
 // Get my records
 router.get("/my-records", authorize("employee", "admin"), toolsListController.getMyRecords);
 
-// Admin only - get all records
-router.get("/all", authorize("admin"), toolsListController.getAll);
+// Get all records (Admin & Employee)
+router.get("/all", authorize("employee", "admin"), toolsListController.getAll);
+
+// Get by employee ID (empId)
+router.get("/employee/:empId", authorize("employee", "admin"), toolsListController.getByEmpId);
 
 // Get single record
 router.get("/:id", authorize("employee", "admin"), toolsListController.getById);

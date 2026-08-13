@@ -32,6 +32,14 @@ const ToolsListItemModel = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      after_report: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      after_report_date: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,

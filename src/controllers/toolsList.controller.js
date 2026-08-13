@@ -50,7 +50,9 @@ const create = async (req, res) => {
         checklist_points: t.checklistPoints || [],
         other: t.other || "",
         description: t.description || "",
-        status: t.status || ""
+        status: t.status || "",
+        after_report: t.afterReport || t.after_report || null,
+        after_report_date: t.afterReportDate || t.after_report_date || null
       }));
 
       await ToolsListItem.bulkCreate(items);
@@ -59,7 +61,7 @@ const create = async (req, res) => {
     const createdRecord = await ToolsList.findByPk(record.id, {
       include: [
         { model: ToolsListItem, as: "tools" },
-        { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email"] },
+        { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email", "location"] },
       ],
     });
 
@@ -81,7 +83,7 @@ const getMyRecords = async (req, res) => {
       where: { user_id },
       include: [
         { model: ToolsListItem, as: "tools" },
-        { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email"] },
+        { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email", "location"] },
       ],
       order: [["createdAt", "DESC"]],
     });
@@ -95,37 +97,64 @@ const getMyRecords = async (req, res) => {
   }
 };
 
-// Get all records (Admin)
+// Get all records
 const getAll = async (req, res) => {
   try {
     const userRole = req.user.roleName || "";
     const isAdmin = ["admin", "administrator", "organization"].includes(userRole.toLowerCase());
 
     let isRoleAdmin = false;
+    let isRoleEmployee = false;
     if (req.user.role) {
       const userRoleRecord = await db.Role.findByPk(req.user.role);
       if (userRoleRecord) {
         const name = (userRoleRecord.role_name || "").toLowerCase();
         if (["admin", "administrator", "organization"].includes(name)) {
           isRoleAdmin = true;
+        } else if (["employee", "incharge"].includes(name)) {
+          isRoleEmployee = true;
         }
       }
     }
 
-    if (!isAdmin && !isRoleAdmin) {
+    const isEmployee = ["employee", "incharge"].includes(userRole.toLowerCase());
+
+    if (!isAdmin && !isRoleAdmin && !isEmployee && !isRoleEmployee) {
       return res.status(403).json({ message: "Access denied" });
     }
 
     const records = await ToolsList.findAll({
       include: [
         { model: ToolsListItem, as: "tools" },
-        { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email"] },
+        { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email", "location"] },
       ],
       order: [["createdAt", "DESC"]],
     });
 
     return res.status(200).json({
       message: "All ToolsList records fetched successfully",
+      data: records,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// Get records by employee ID (empId)
+const getByEmpId = async (req, res) => {
+  try {
+    const { empId } = req.params;
+    const records = await ToolsList.findAll({
+      where: { employee_id: empId },
+      include: [
+        { model: ToolsListItem, as: "tools" },
+        { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email", "location"] },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    return res.status(200).json({
+      message: `ToolsList records for employee ${empId} fetched successfully`,
       data: records,
     });
   } catch (error) {
@@ -144,7 +173,7 @@ const getById = async (req, res) => {
     const record = await ToolsList.findByPk(id, {
       include: [
         { model: ToolsListItem, as: "tools" },
-        { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email"] },
+        { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email", "location"] },
       ],
     });
 
@@ -221,11 +250,13 @@ const update = async (req, res) => {
     if (parsedTools && parsedTools.length > 0) {
       const items = parsedTools.map((t) => ({
         tools_list_id: id,
-        tool_name: t.toolName || "Unknown Tool",
+        tool_name: t.toolName || t.tool_name || "Unknown Tool",
         checklist_points: t.checklistPoints || t.checklist_points || [],
         other: t.other || "",
         description: t.description || "",
-        status: t.status || ""
+        status: t.status || "",
+        after_report: t.afterReport || t.after_report || null,
+        after_report_date: t.afterReportDate || t.after_report_date || null
       }));
 
       await ToolsListItem.bulkCreate(items);
@@ -270,6 +301,7 @@ export default {
   create,
   getMyRecords,
   getAll,
+  getByEmpId,
   getById,
   update,
   remove,
