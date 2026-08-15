@@ -4,6 +4,10 @@ const ToolsAndTackles = db.ToolsAndTackles;
 const ToolStatus = db.ToolStatus;
 const User = db.User;
 
+// Helper to get VendorCode from request
+const getVendorCode = (req) =>
+  req.user?.VendorCode || req.query.VendorCode || req.body.VendorCode || null;
+
 // Create a new tools and tackles checklist
 const create = async (req, res) => {
   try {
@@ -19,7 +23,7 @@ const create = async (req, res) => {
     } = req.body;
 
     const user_id = req.user.id;
-
+    const VendorCode = getVendorCode(req);
     const finalPermitNo = permit_no || `PERMIT-${Date.now()}`;
 
     // Create parent record
@@ -32,6 +36,8 @@ const create = async (req, res) => {
       job_description: job_description || "Tools & Tackles Checklist Points",
       status: status || "Pending",
       user_id,
+      org_id: req.user?.org_id || 1,
+      VendorCode,
     });
 
     // Parse and create child records if toolTackles is present
@@ -79,8 +85,10 @@ const create = async (req, res) => {
 const getMyRecords = async (req, res) => {
   try {
     const user_id = req.user.id;
+    const VendorCode = getVendorCode(req);
+    const whereClause = VendorCode ? { user_id, VendorCode } : { user_id };
     const records = await ToolsAndTackles.findAll({
-      where: { user_id },
+      where: whereClause,
       include: [
         { model: ToolStatus, as: "tools_status" },
         { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email"] },
@@ -125,7 +133,10 @@ const getAll = async (req, res) => {
       return res.status(403).json({ message: "Access denied" });
     }
 
+    const VendorCode = getVendorCode(req);
+    const whereClause = VendorCode ? { VendorCode } : {};
     const records = await ToolsAndTackles.findAll({
+      where: whereClause,
       include: [
         { model: ToolStatus, as: "tools_status" },
         { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email"] },

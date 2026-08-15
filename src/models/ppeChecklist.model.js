@@ -7,6 +7,10 @@ const PPEChecklistModel = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      VendorCode: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       permit_no: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -42,6 +46,10 @@ const PPEChecklistModel = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      org_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,
@@ -57,6 +65,10 @@ const PPEChecklistModel = (sequelize, DataTypes) => {
     PPEChecklist.hasMany(models.PPEChecklistItem, {
       foreignKey: "ppe_checklist_id",
       as: "ppe_checklist_items",
+    });
+    PPEChecklist.belongsTo(models.Organization, {
+      foreignKey: "org_id",
+      as: "organization",
     });
   };
 

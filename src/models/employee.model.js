@@ -7,6 +7,10 @@ const EmployeeModel = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      VendorCode: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       emp_id: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -16,6 +20,10 @@ const EmployeeModel = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      org_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,
@@ -23,8 +31,14 @@ const EmployeeModel = (sequelize, DataTypes) => {
     }
   );
 
+  Employee.associate = (models) => {
+    Employee.belongsTo(models.Organization, {
+      foreignKey: "org_id",
+      as: "organization",
+    });
+  };
+
   return Employee;
 };
 
 export default EmployeeModel;
-

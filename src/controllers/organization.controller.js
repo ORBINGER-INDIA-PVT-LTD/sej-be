@@ -95,6 +95,8 @@ export const loginOrganization = async (req, res) => {
     const token = jwt.sign(
       {
         id: org.id,
+        org_id: org.id,
+        VendorCode: org.VendorCode,
         role: org.role,
       },
       process.env.JWT_SECRET,
@@ -205,6 +207,34 @@ export const updateOrganization = async (req, res) => {
     console.error("Org update error:", err);
     return res.status(500).json({
       message: "Internal server error occurred during organization update",
+      error: err.message,
+    });
+  }
+};
+
+export const getOrganizationProfile = async (req, res) => {
+  try {
+    const VendorCode = req.user?.VendorCode || req.query.VendorCode || req.body.VendorCode || null;
+    let org = null;
+    if (VendorCode) {
+      org = await Organization.findOne({ where: { VendorCode } });
+    } else {
+      const orgId = req.user?.org_id;
+      if (orgId) {
+        org = await Organization.findByPk(orgId);
+      }
+    }
+    if (!org) {
+      return res.status(404).json({ message: "Organization not found" });
+    }
+    return res.status(200).json({
+      message: "Organization profile retrieved successfully",
+      organization: org
+    });
+  } catch (err) {
+    console.error("Fetch organization profile error:", err);
+    return res.status(500).json({
+      message: "Internal server error occurred while fetching organization profile",
       error: err.message,
     });
   }

@@ -7,6 +7,10 @@ const User = db.User;
 
 const FOLDER = "uploads";
 
+// Helper to get VendorCode from request
+const getVendorCode = (req) =>
+  req.user?.VendorCode || req.query.VendorCode || req.body.VendorCode || null;
+
 const parseJsonArray = (value, fallback = []) => {
   if (value == null) return fallback;
   if (Array.isArray(value)) return value;
@@ -67,6 +71,8 @@ const create = async (req, res) => {
 
     const parsedActionItems = parseJsonArray(action_items, []);
 
+    const VendorCode = getVendorCode(req);
+
     // Create the tool box tackle
     const toolBoxTackle = await ToolBoxTackle.create({
       date: date || new Date(),
@@ -85,6 +91,8 @@ const create = async (req, res) => {
       employees: parsedEmployees,
       employee_group_photo,
       user_id,
+      org_id: req.user?.org_id || 1,
+      VendorCode,
     });
 
     // Create action items if provided (Point 7)
@@ -124,9 +132,11 @@ const create = async (req, res) => {
 const getMyRecords = async (req, res) => {
   try {
     const user_id = req.user.id;
+    const VendorCode = getVendorCode(req);
+    const whereClause = VendorCode ? { user_id, VendorCode } : { user_id };
 
     const records = await ToolBoxTackle.findAll({
-      where: { user_id },
+      where: whereClause,
       include: [
         { model: ToolBoxTackleAction, as: "action_items" },
         {
@@ -147,10 +157,13 @@ const getMyRecords = async (req, res) => {
   }
 };
 
-// Get all tool box tackles (for admin)
+// Get all tool box tackles (for admin/org)
 const getAll = async (req, res) => {
   try {
+    const VendorCode = getVendorCode(req);
+    const whereClause = VendorCode ? { VendorCode } : {};
     const records = await ToolBoxTackle.findAll({
+      where: whereClause,
       include: [
         { model: ToolBoxTackleAction, as: "action_items" },
         {

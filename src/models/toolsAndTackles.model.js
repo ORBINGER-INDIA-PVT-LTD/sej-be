@@ -7,6 +7,10 @@ const ToolsAndTacklesModel = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      VendorCode: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,

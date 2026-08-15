@@ -7,6 +7,10 @@ const User = db.User; // User model for employee info
 
 const FOLDER = "uploads"; // S3 folder name for uploaded images
 
+// Helper to get VendorCode from request
+const getVendorCode = (req) =>
+  req.user?.VendorCode || req.query.VendorCode || req.body.VendorCode || null;
+
 // Helper: safely parse a JSON array from form-data string or return []
 const parseJsonArray = (value) => {
   if (value == null) return [];
@@ -254,6 +258,8 @@ const create = async (req, res) => {
         job_description,
         status: status || "open",
         user_id,
+        org_id: req.user?.org_id || 1,
+        VendorCode: getVendorCode(req),
       });
 
       // Insert all ppe_checklist_items child rows, linking them to the parent record
@@ -293,6 +299,8 @@ const create = async (req, res) => {
       job_description,
       status: status || "open",
       user_id,
+      org_id: req.user?.org_id || 1,
+      VendorCode: getVendorCode(req),
     });
 
     // Fetch and return the created record
@@ -350,7 +358,10 @@ const getMyRecords = async (req, res) => {
 // GET /api/ppe-checklists/all — admin only, get all records from all users
 const getAll = async (req, res) => {
   try {
+    const VendorCode = getVendorCode(req);
+    const whereClause = VendorCode ? { VendorCode } : {};
     const records = await PPEChecklist.findAll({
+      where: whereClause,
       include: [
         { model: PPEChecklistItem, as: "ppe_checklist_items" },
         {

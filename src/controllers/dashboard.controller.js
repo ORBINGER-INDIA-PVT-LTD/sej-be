@@ -23,17 +23,23 @@ export const getDashboardKPIs = async (req, res) => {
     const startDate = new Date(year, monthNum - 1, 1, 0, 0, 0, 0);
     const endDate = new Date(year, monthNum - 1, lastDay, 23, 59, 59, 999);
 
+    const VendorCode = req.user?.VendorCode || req.query.VendorCode || null;
+
     const monthWhereDate = {
+      ...(VendorCode && { VendorCode }),
       date: {
         [Op.between]: [startDateStr, endDateStr]
       }
     };
 
     const monthWhereCreatedAt = {
+      ...(VendorCode && { VendorCode }),
       createdAt: {
         [Op.between]: [startDate, endDate]
       }
     };
+
+    const recentWhere = VendorCode ? { VendorCode } : {};
 
     const [
       totalEmployees,
@@ -54,7 +60,6 @@ export const getDashboardKPIs = async (req, res) => {
       db.ToolsListItem.count({
         where: {
           [Op.and]: [
-            monthWhereCreatedAt,
             {
               [Op.or]: [
                 { status: { [Op.like]: '%attention%' } },
@@ -67,12 +72,17 @@ export const getDashboardKPIs = async (req, res) => {
               ]
             }
           ]
-        }
+        },
+        include: [{
+          model: db.ToolsList,
+          as: 'toolsList',
+          where: monthWhereCreatedAt,
+          attributes: []
+        }]
       }),
       db.PpeInspectionItem.count({
         where: {
           [Op.and]: [
-            monthWhereCreatedAt,
             {
               [Op.or]: [
                 { status: { [Op.like]: '%attention%' } },
@@ -85,14 +95,27 @@ export const getDashboardKPIs = async (req, res) => {
               ]
             }
           ]
-        }
+        },
+        include: [{
+          model: db.PpeInspectionEmployee,
+          as: 'employeeInspection',
+          required: true,
+          include: [{
+            model: db.PpeInspection,
+            as: 'ppeInspection',
+            where: monthWhereCreatedAt,
+            attributes: []
+          }]
+        }]
       }),
       db.ToolsList.findAll({
+        where: recentWhere,
         limit: 5,
         order: [['createdAt', 'DESC']],
         attributes: ['id', 'permit_number', 'date', 'name_of_supervisor', 'createdAt']
       }),
       db.PpeInspection.findAll({
+        where: recentWhere,
         limit: 5,
         order: [['createdAt', 'DESC']],
         attributes: ['id', 'permit_number', 'date', 'name_of_supervisor', 'createdAt']

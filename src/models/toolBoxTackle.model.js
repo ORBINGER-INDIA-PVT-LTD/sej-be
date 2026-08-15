@@ -7,6 +7,10 @@ const ToolBoxTackleModel = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      VendorCode: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       date: {
         type: DataTypes.DATEONLY,
         allowNull: false,
@@ -81,6 +85,10 @@ const ToolBoxTackleModel = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      org_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,
@@ -96,6 +104,10 @@ const ToolBoxTackleModel = (sequelize, DataTypes) => {
     ToolBoxTackle.hasMany(models.ToolBoxTackleAction, {
       foreignKey: "tool_box_tackle_id",
       as: "action_items",
+    });
+    ToolBoxTackle.belongsTo(models.Organization, {
+      foreignKey: "org_id",
+      as: "organization",
     });
   };
 

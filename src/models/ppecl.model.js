@@ -7,9 +7,17 @@ const PpeclModel = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      VendorCode: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+      },
+      org_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
       },
     },
     {
@@ -26,6 +34,10 @@ const PpeclModel = (sequelize, DataTypes) => {
     Ppecl.hasMany(models.PpeclStatus, {
       foreignKey: "ppecl_id",
       as: "ppecl_status",
+    });
+    Ppecl.belongsTo(models.Organization, {
+      foreignKey: "org_id",
+      as: "organization",
     });
   };
 

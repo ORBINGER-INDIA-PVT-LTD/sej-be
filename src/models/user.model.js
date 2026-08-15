@@ -7,6 +7,10 @@ const UserModel = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      VendorCode: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       emp_id: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -36,6 +40,10 @@ const UserModel = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      org_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,
@@ -46,6 +54,10 @@ const UserModel = (sequelize, DataTypes) => {
   User.associate = (models) => {
     User.belongsTo(models.Role, {
       foreignKey: "role_id",
+    });
+    User.belongsTo(models.Organization, {
+      foreignKey: "org_id",
+      as: "organization",
     });
   };
 

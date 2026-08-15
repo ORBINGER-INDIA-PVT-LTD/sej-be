@@ -7,6 +7,10 @@ const PpeInspectionModel = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      VendorCode: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -35,6 +39,10 @@ const PpeInspectionModel = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: true,
       },
+      org_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,
@@ -50,6 +58,10 @@ const PpeInspectionModel = (sequelize, DataTypes) => {
     PpeInspection.hasMany(models.PpeInspectionEmployee, {
       foreignKey: "ppe_inspection_id",
       as: "employees",
+    });
+    PpeInspection.belongsTo(models.Organization, {
+      foreignKey: "org_id",
+      as: "organization",
     });
   };
 

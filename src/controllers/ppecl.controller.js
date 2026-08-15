@@ -4,14 +4,23 @@ const Ppecl = db.Ppecl;
 const PpeclStatus = db.PpeclStatus;
 const User = db.User;
 
+// Helper to get VendorCode from request
+const getVendorCode = (req) =>
+  req.user?.VendorCode || req.query.VendorCode || req.body.VendorCode || null;
+
 // Create a new PPECL checklist
 const create = async (req, res) => {
   try {
     const { toolTackles } = req.body;
     const user_id = req.user.id;
+    const VendorCode = getVendorCode(req);
 
     // Create parent record
-    const record = await Ppecl.create({ user_id });
+    const record = await Ppecl.create({
+      user_id,
+      org_id: req.user?.org_id || 1,
+      VendorCode,
+    });
 
     // Parse and create child records if toolTackles is present
     let parsedTools = [];
@@ -57,8 +66,10 @@ const create = async (req, res) => {
 const getMyRecords = async (req, res) => {
   try {
     const user_id = req.user.id;
+    const VendorCode = getVendorCode(req);
+    const whereClause = VendorCode ? { user_id, VendorCode } : { user_id };
     const records = await Ppecl.findAll({
-      where: { user_id },
+      where: whereClause,
       include: [
         { model: PpeclStatus, as: "ppecl_status" },
         { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email"] },
@@ -101,7 +112,10 @@ const getAll = async (req, res) => {
       return res.status(403).json({ message: "Access denied" });
     }
 
+    const VendorCode = getVendorCode(req);
+    const whereClause = VendorCode ? { VendorCode } : {};
     const records = await Ppecl.findAll({
+      where: whereClause,
       include: [
         { model: PpeclStatus, as: "ppecl_status" },
         { model: User, as: "employee", attributes: ["id", "emp_id", "emp_name", "email"] },

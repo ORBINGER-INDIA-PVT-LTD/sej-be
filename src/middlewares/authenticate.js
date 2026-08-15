@@ -8,7 +8,7 @@ export const authenticate = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // { id, role }
+    req.user = decoded; // { id, role, org_id, VendorCode }
 
     if (req.user && req.user.role) {
       if (typeof req.user.role === "number" || !isNaN(Number(req.user.role))) {
@@ -19,6 +19,23 @@ export const authenticate = async (req, res, next) => {
       }
     } else {
       req.user.roleName = "employee";
+    }
+
+    // Resolve VendorCode — from token, fallback to query/body param
+    if (!req.user.VendorCode) {
+      req.user.VendorCode = req.query.VendorCode || req.body.VendorCode || null;
+    }
+
+    // If still no VendorCode and this is an employee, fetch from DB
+    if (!req.user.VendorCode && req.user.id && req.user.roleName !== "organization") {
+      const userRecord = await db.User.findByPk(req.user.id, { attributes: ["VendorCode", "org_id"] });
+      req.user.VendorCode = userRecord?.VendorCode || null;
+      req.user.org_id = userRecord?.org_id || req.user.org_id || 1;
+    }
+
+    // Ensure req.user.org_id is set (for backward compat)
+    if (!req.user.org_id) {
+      req.user.org_id = 1;
     }
 
     next();

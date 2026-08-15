@@ -7,6 +7,10 @@ const DailyJobPlanModel = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      VendorCode: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       permit_no: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -49,6 +53,14 @@ const DailyJobPlanModel = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      org_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'organizations',
+          key: 'id'
+        }
+      },
     },
     {
       timestamps: true,
@@ -64,6 +76,10 @@ const DailyJobPlanModel = (sequelize, DataTypes) => {
     DailyJobPlan.hasMany(models.Hazard, {
       foreignKey: "daily_job_plan_id",
       as: "hazards",
+    });
+    DailyJobPlan.belongsTo(models.Organization, {
+      foreignKey: "org_id",
+      as: "organization"
     });
   };
 

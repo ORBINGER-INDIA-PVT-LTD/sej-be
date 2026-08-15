@@ -19,13 +19,22 @@ router.post("/register-admin", authController.register);
 // Admin only - get all users
 router.get(
   "/users",
+  authenticate,
   authController.getAllUsers
 );
 
 // Admin / Auth - delete user
 router.delete(
   "/users/:id",
+  authenticate,
   authController.deleteUser
+);
+
+// Admin / Auth - update user
+router.put(
+  "/users/:id",
+  authenticate,
+  authController.updateUser
 );
 
 export default router;

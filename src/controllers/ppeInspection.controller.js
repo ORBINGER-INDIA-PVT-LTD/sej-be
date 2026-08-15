@@ -5,6 +5,10 @@ const PpeInspectionEmployee = db.PpeInspectionEmployee;
 const PpeInspectionItem = db.PpeInspectionItem;
 const User = db.User;
 
+// Helper to get VendorCode from request
+const getVendorCode = (req) =>
+  req.user?.VendorCode || req.query.VendorCode || req.body.VendorCode || null;
+
 // Helper to include nested associations cleanly
 const getNestedIncludes = () => [
   { model: User, as: "user", attributes: ["id", "emp_name", "email", "location"] },
@@ -31,6 +35,7 @@ const create = async (req, res) => {
       employees, // structured list: [ { employeeId, items: [...] } ]
     } = req.body;
     const user_id = req.user.id;
+    const VendorCode = getVendorCode(req);
 
     // Create parent permit record
     const record = await PpeInspection.create({
@@ -41,6 +46,8 @@ const create = async (req, res) => {
       name_of_supervisor: nameOfSupervisor,
       sop_number: sopNumber,
       job_description: jobDescription,
+      org_id: req.user?.org_id || 1,
+      VendorCode,
     });
 
     let parsedEmployees = [];
@@ -132,7 +139,10 @@ const getAll = async (req, res) => {
       return res.status(403).json({ message: "Access denied" });
     }
 
+    const VendorCode = getVendorCode(req);
+    const whereClause = VendorCode ? { VendorCode } : {};
     const records = await PpeInspection.findAll({
+      where: whereClause,
       include: getNestedIncludes(),
       order: [["createdAt", "DESC"]],
     });

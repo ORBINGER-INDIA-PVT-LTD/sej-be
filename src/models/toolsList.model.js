@@ -7,6 +7,10 @@ const ToolsListModel = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      VendorCode: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -39,6 +43,10 @@ const ToolsListModel = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: true,
       },
+      org_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,
@@ -54,6 +62,10 @@ const ToolsListModel = (sequelize, DataTypes) => {
     ToolsList.hasMany(models.ToolsListItem, {
       foreignKey: "tools_list_id",
       as: "tools",
+    });
+    ToolsList.belongsTo(models.Organization, {
+      foreignKey: "org_id",
+      as: "organization",
     });
   };
 
