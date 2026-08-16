@@ -32,6 +32,7 @@ const sequelizeOptions = {
   host: process.env.DB_HOST,
   dialect: "mysql",
   port: parseInt(process.env.DB_PORT || "3306", 10),
+  logging: false,
 };
 
 // Automatically enable SSL support for AWS RDS endpoints or when DB_SSL is true
