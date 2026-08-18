@@ -23,7 +23,7 @@ export const authenticate = async (req, res, next) => {
 
     // Resolve VendorCode — from token, fallback to query/body param
     if (!req.user.VendorCode) {
-      req.user.VendorCode = req.query.VendorCode || req.body.VendorCode || null;
+      req.user.VendorCode = req.query.VendorCode || req.body?.VendorCode || null;
     }
 
     // If still no VendorCode and this is an employee, fetch from DB
@@ -40,6 +40,6 @@ export const authenticate = async (req, res, next) => {
 
     next();
   } catch (err) {
-    return res.status(403).json({ message: "Invalid token" });
+    return res.status(401).json({ message: err.name === "JsonWebTokenError" || err.name === "TokenExpiredError" ? "Invalid token" : err.message });
   }
 };

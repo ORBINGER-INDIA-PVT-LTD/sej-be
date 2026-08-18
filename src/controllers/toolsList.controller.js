@@ -122,13 +122,13 @@ const getAll = async (req, res) => {
         const name = (userRoleRecord.role_name || "").toLowerCase();
         if (["admin", "administrator", "organization"].includes(name)) {
           isRoleAdmin = true;
-        } else if (["employee", "incharge"].includes(name)) {
+        } else if (["employee", "incharge", "supervisor", "safety supervisor"].includes(name)) {
           isRoleEmployee = true;
         }
       }
     }
 
-    const isEmployee = ["employee", "incharge"].includes(userRole.toLowerCase());
+    const isEmployee = ["employee", "incharge", "supervisor", "safety supervisor"].includes(userRole.toLowerCase());
 
     if (!isAdmin && !isRoleAdmin && !isEmployee && !isRoleEmployee) {
       return res.status(403).json({ message: "Access denied" });

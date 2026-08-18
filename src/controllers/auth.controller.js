@@ -271,10 +271,11 @@ const updateUser = async (req, res) => {
     }
 
     if (role) {
-      const roleRecord = await Role.findOne({ where: { role_name: role.toLowerCase() } });
-      if (roleRecord) {
-        user.role_id = roleRecord.id;
-      }
+      const [roleRecord] = await Role.findOrCreate({
+        where: { role_name: role.toLowerCase() },
+        defaults: { role_name: role.toLowerCase() },
+      });
+      user.role_id = roleRecord.id;
     }
 
     await user.save();

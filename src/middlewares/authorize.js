@@ -19,8 +19,8 @@ export const authorize = (...allowedRoles) => {
 
       // Treat 'administrator' and 'organization' as equivalent to 'admin'
       const isAdminRole = ["admin", "administrator", "organization"].includes(normalizedUserRole);
-      // Treat 'incharge' as equivalent to 'employee'
-      const isEmployeeRole = ["employee", "incharge"].includes(normalizedUserRole);
+      // Treat 'incharge', 'supervisor' and 'safety supervisor' as equivalent to 'employee'
+      const isEmployeeRole = ["employee", "incharge", "supervisor", "safety supervisor"].includes(normalizedUserRole);
       
       const isAllowed =
         normalizedAllowed.includes(normalizedUserRole) ||
