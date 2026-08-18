@@ -25,7 +25,7 @@ router.get("/all", authorize("admin"), toolBoxTackleController.getAll);
 router.get("/:id", authorize("employee", "admin"), toolBoxTackleController.getById);
 router.put(
   "/:id",
-  authorize("employee", "admin"),
+  authorize("admin"),
   uploadToolBoxTackleGroupPhoto,
   toolBoxTackleController.update
 );

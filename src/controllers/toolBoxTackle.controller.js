@@ -32,6 +32,8 @@ const create = async (req, res) => {
       date,
       section,
       department,
+      location,
+      duration,
       company_supervisor,
       safety_representative,
       contractor_representative,
@@ -78,6 +80,8 @@ const create = async (req, res) => {
       date: date || new Date(),
       section,
       department,
+      location,
+      duration,
       company_supervisor,
       safety_representative,
       contractor_representative,
@@ -244,6 +248,8 @@ const update = async (req, res) => {
       date,
       section,
       department,
+      location,
+      duration,
       company_supervisor,
       safety_representative,
       contractor_representative,
@@ -285,6 +291,8 @@ const update = async (req, res) => {
       date: date || record.date,
       section: section || record.section,
       department: department || record.department,
+      location: location !== undefined ? location : record.location,
+      duration: duration !== undefined ? duration : record.duration,
       company_supervisor: company_supervisor || record.company_supervisor,
       safety_representative:
         safety_representative !== undefined
@@ -327,19 +335,19 @@ const update = async (req, res) => {
     });
 
     // Update action items if provided (replace all existing)
-    if (parsedActionItems && parsedActionItems.length > 0) {
-      // Delete existing action items
+    if (action_items !== undefined) {
       await ToolBoxTackleAction.destroy({ where: { tool_box_tackle_id: id } });
 
-      // Create new action items
-      const actionRecords = parsedActionItems.map((action) => ({
-        item: action.item,
-        action_by: action.action_by,
-        when: action.when,
-        tool_box_tackle_id: id,
-      }));
+      if (parsedActionItems.length > 0) {
+        const actionRecords = parsedActionItems.map((action) => ({
+          item: action.item,
+          action_by: action.action_by,
+          when: action.when,
+          tool_box_tackle_id: id,
+        }));
 
-      await ToolBoxTackleAction.bulkCreate(actionRecords);
+        await ToolBoxTackleAction.bulkCreate(actionRecords);
+      }
     }
 
     // Fetch updated record

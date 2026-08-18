@@ -24,6 +24,14 @@ const ToolBoxTackleModel = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      location: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      duration: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       company_supervisor: {
         type: DataTypes.STRING,
         allowNull: false,
