@@ -18,6 +18,8 @@ import ToolsListItemModel from "./toolsListItem.model.js";
 import PpeInspectionModel from "./ppeInspection.model.js";
 import PpeInspectionItemModel from "./ppeInspectionItem.model.js";
 import PpeInspectionEmployeeModel from "./ppeInspectionEmployee.model.js";
+import LocationModel from "./location.model.js";
+import PlantModel from "./plant.model.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -81,6 +83,8 @@ db.ToolsListItem = ToolsListItemModel(sequelize, Sequelize);
 db.PpeInspection = PpeInspectionModel(sequelize, Sequelize);
 db.PpeInspectionEmployee = PpeInspectionEmployeeModel(sequelize, Sequelize);
 db.PpeInspectionItem = PpeInspectionItemModel(sequelize, Sequelize);
+db.Location = LocationModel(sequelize, Sequelize);
+db.Plant = PlantModel(sequelize, Sequelize);
 
 // Associations
 Object.keys(db).forEach((modelName) => {

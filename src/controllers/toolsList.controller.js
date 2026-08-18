@@ -18,6 +18,7 @@ const create = async (req, res) => {
       nameOfSupervisor, 
       sopNumber, 
       jobDescription, 
+      location,
       tools,
       employeeId
     } = req.body;
@@ -34,6 +35,7 @@ const create = async (req, res) => {
       name_of_supervisor: nameOfSupervisor,
       sop_number: sopNumber,
       job_description: jobDescription,
+      location,
       org_id: req.user?.org_id || 1,
       VendorCode,
     });
@@ -217,6 +219,7 @@ const update = async (req, res) => {
       nameOfSupervisor, 
       sopNumber, 
       jobDescription, 
+      location,
       tools,
       employeeId
     } = req.body;
@@ -241,6 +244,7 @@ const update = async (req, res) => {
       name_of_supervisor: nameOfSupervisor,
       sop_number: sopNumber,
       job_description: jobDescription,
+      location,
       updatedAt: new Date()
     });
 

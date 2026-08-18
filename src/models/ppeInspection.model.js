@@ -39,6 +39,10 @@ const PpeInspectionModel = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: true,
       },
+      location: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       org_id: {
         type: DataTypes.INTEGER,
         allowNull: true,

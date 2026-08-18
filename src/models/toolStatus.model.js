@@ -15,6 +15,11 @@ const ToolStatusModel = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      plant: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: "All",
+      },
       tool_status: {
         type: DataTypes.STRING,
         allowNull: true,

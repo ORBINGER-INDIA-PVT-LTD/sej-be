@@ -56,6 +56,7 @@ const create = async (req, res) => {
       const statusRecords = parsedTools.map((tool) => ({
         tools_and_tackles_id: record.id,
         tool_name: tool.toolName || "Unknown Tool",
+        plant: tool.plant || "All",
         tool_status: "Pending", // Default overall status
         tool_checklist: tool.toolChecklist || [],
       }));
@@ -224,6 +225,7 @@ const update = async (req, res) => {
       const statusRecords = parsedTools.map((tool) => ({
         tools_and_tackles_id: id,
         tool_name: tool.toolName || "Unknown Tool",
+        plant: tool.plant || "All",
         tool_status: "Pending",
         tool_checklist: tool.toolChecklist || tool.points || [],
       }));
