@@ -37,4 +37,11 @@ router.put(
   authController.updateUser
 );
 
+// Any user or org can change their password
+router.put(
+  "/change-password",
+  authenticate,
+  authController.changePassword
+);
+
 export default router;

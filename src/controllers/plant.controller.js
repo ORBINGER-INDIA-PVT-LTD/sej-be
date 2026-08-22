@@ -106,7 +106,11 @@ const update = async (req, res) => {
     const updates = { updatedAt: new Date() };
     if (PlantId !== undefined && PlantId !== null) {
       const finalPlantId = String(PlantId).trim();
-      const whereClause = { PlantId: finalPlantId, id: { [db.Sequelize.Op.ne]: id } };
+      const whereClause = { 
+        PlantId: finalPlantId, 
+        ...(record.VendorCode && { VendorCode: record.VendorCode }),
+        id: { [db.Sequelize.Op.ne]: id } 
+      };
       const duplicate = await Plant.findOne({ where: whereClause });
       if (duplicate) {
         return res.status(400).json({ message: `PlantId ${finalPlantId} already exists` });

@@ -10,7 +10,6 @@ const PlantModel = (sequelize, DataTypes) => {
       PlantId: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
       },
       PlantName: {
         type: DataTypes.STRING,

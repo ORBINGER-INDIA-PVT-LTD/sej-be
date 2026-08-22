@@ -106,7 +106,11 @@ const update = async (req, res) => {
     const updates = { updatedAt: new Date() };
     if (LocationId !== undefined && LocationId !== null) {
       const finalLocationId = String(LocationId).trim();
-      const whereClause = { LocationId: finalLocationId, id: { [db.Sequelize.Op.ne]: id } };
+      const whereClause = { 
+        LocationId: finalLocationId, 
+        ...(record.VendorCode && { VendorCode: record.VendorCode }),
+        id: { [db.Sequelize.Op.ne]: id } 
+      };
       const duplicate = await Location.findOne({ where: whereClause });
       if (duplicate) {
         return res.status(400).json({ message: `LocationId ${finalLocationId} already exists` });

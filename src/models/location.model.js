@@ -10,7 +10,6 @@ const LocationModel = (sequelize, DataTypes) => {
       LocationId: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
       },
       LocationName: {
         type: DataTypes.STRING,
