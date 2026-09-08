@@ -28,6 +28,14 @@ const ToolBoxTackleModel = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      permit_number: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      shift: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       duration: {
         type: DataTypes.STRING,
         allowNull: true,

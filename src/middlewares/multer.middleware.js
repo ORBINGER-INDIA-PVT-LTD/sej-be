@@ -40,5 +40,4 @@ export const ppeChecklistItemImageFields = multer({
 export const uploadToolBoxTackleGroupPhoto = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 1048576 }, // 1 mb
 }).single("employee_group_photo");

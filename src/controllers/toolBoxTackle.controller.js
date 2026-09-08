@@ -1,5 +1,6 @@
 import db from "../models/index.js";
 import { uploadToS3 } from "../services/upload.service.js";
+import sharp from "sharp";
 
 const ToolBoxTackle = db.ToolBoxTackle;
 const ToolBoxTackleAction = db.ToolBoxTackleAction;
@@ -33,6 +34,8 @@ const create = async (req, res) => {
       section,
       department,
       location,
+      permit_number,
+      shift,
       duration,
       company_supervisor,
       safety_representative,
@@ -55,6 +58,20 @@ const create = async (req, res) => {
     // Upload group photo to S3 first (do not save record if upload fails)
     let employee_group_photo = "";
     if (req.file) {
+      try {
+        const compressedBuffer = await sharp(req.file.buffer)
+          .resize({ width: 1200, withoutEnlargement: true }) // resize if it's too large
+          .jpeg({ quality: 75 }) // compress and convert to jpeg
+          .toBuffer();
+        
+        req.file.buffer = compressedBuffer;
+        req.file.size = compressedBuffer.length;
+        req.file.mimetype = "image/jpeg";
+      } catch (err) {
+        console.error("Image compression error:", err);
+        // Continue with original file if compression fails, or you could return an error here
+      }
+
       const uploadResult = await uploadToS3(req.file, FOLDER);
       if (!uploadResult.status) {
         return res.status(400).json({
@@ -81,6 +98,8 @@ const create = async (req, res) => {
       section,
       department,
       location,
+      permit_number,
+      shift,
       duration,
       company_supervisor,
       safety_representative,
@@ -249,6 +268,8 @@ const update = async (req, res) => {
       section,
       department,
       location,
+      permit_number,
+      shift,
       duration,
       company_supervisor,
       safety_representative,
@@ -292,6 +313,8 @@ const update = async (req, res) => {
       section: section || record.section,
       department: department || record.department,
       location: location !== undefined ? location : record.location,
+      permit_number: permit_number !== undefined ? permit_number : record.permit_number,
+      shift: shift !== undefined ? shift : record.shift,
       duration: duration !== undefined ? duration : record.duration,
       company_supervisor: company_supervisor || record.company_supervisor,
       safety_representative:
