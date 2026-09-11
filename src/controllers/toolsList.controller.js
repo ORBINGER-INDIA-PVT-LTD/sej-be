@@ -313,6 +313,28 @@ const remove = async (req, res) => {
   }
 };
 
+// Update a single item's after_report
+const updateItemAfterReport = async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const { afterReport, afterReportDate } = req.body;
+
+    const item = await ToolsListItem.findByPk(itemId);
+    if (!item) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
+    await item.update({
+      after_report: afterReport,
+      after_report_date: afterReportDate,
+    });
+
+    return res.status(200).json({ message: "After report updated successfully", data: item });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 export default {
   create,
   getMyRecords,
@@ -321,4 +343,5 @@ export default {
   getById,
   update,
   remove,
+  updateItemAfterReport,
 };

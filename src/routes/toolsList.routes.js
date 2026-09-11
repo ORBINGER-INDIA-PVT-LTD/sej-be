@@ -29,4 +29,7 @@ router.put("/:id", authorize("employee", "admin"), toolsListController.update);
 // Delete single record
 router.delete("/:id", authorize("employee", "admin"), toolsListController.remove);
 
+// Update single item after-report
+router.put("/item/:itemId/after-report", authorize("employee", "admin"), toolsListController.updateItemAfterReport);
+
 export default router;
