@@ -91,7 +91,7 @@ export const loginOrganization = async (req, res) => {
       return res.status(401).json({ message: "Invalid password" });
     }
 
-    // Sign JWT token
+    // Sign JWT token (no expiration - stays valid until logout)
     const token = jwt.sign(
       {
         id: org.id,
@@ -99,8 +99,7 @@ export const loginOrganization = async (req, res) => {
         VendorCode: org.VendorCode,
         role: org.role,
       },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      process.env.JWT_SECRET
     );
 
     return res.status(200).json({

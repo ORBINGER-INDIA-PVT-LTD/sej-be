@@ -53,7 +53,7 @@ const register = async (req, res) => {
     if (authHeader && authHeader.startsWith("Bearer ")) {
       const token = authHeader.split(" ")[1];
       try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET, { ignoreExpiration: true });
         if (decoded) {
           VendorCode = VendorCode || decoded.VendorCode || null;
           if (decoded.role && decoded.role.toString().toLowerCase() === "organization") {
@@ -128,7 +128,7 @@ const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid password" });
     }
 
-    // Include VendorCode in JWT
+    // Include VendorCode in JWT (no expiration - stays valid until logout)
     const token = jwt.sign(
       {
         id: user.id,
@@ -136,8 +136,7 @@ const login = async (req, res) => {
         org_id: user.org_id || 1,
         VendorCode: user.VendorCode || null,
       },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      process.env.JWT_SECRET
     );
 
     const organizationData = await Organization.findAll();
@@ -188,6 +187,7 @@ const adminLogin = async (req, res) => {
       return res.status(403).json({ message: "Admin access required" });
     }
 
+    // Admin JWT (no expiration - stays valid until logout)
     const token = jwt.sign(
       {
         id: user.id,
@@ -195,8 +195,7 @@ const adminLogin = async (req, res) => {
         org_id: user.org_id || 1,
         VendorCode: user.VendorCode || null,
       },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      process.env.JWT_SECRET
     );
 
     const organizationData = await Organization.findAll();

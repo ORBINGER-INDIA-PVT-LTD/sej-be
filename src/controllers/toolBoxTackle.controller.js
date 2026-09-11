@@ -26,6 +26,55 @@ const parseJsonArray = (value, fallback = []) => {
   return fallback;
 };
 
+const PPE_KEYS = [
+  "helmet",
+  "safety_goggles",
+  "nose_mask",
+  "hand_gloves",
+  "fr_jacket",
+  "safety_shoes",
+  "full_body_harness",
+  "physical_fit_for_duty",
+  "calibration_co_detector",
+];
+
+const normalizeEmployee = (emp) => {
+  if (!emp) return null;
+  if (typeof emp === "string") {
+    const trimmed = emp.trim();
+    if (!trimmed) return null;
+    const item = { name: trimmed };
+    PPE_KEYS.forEach((key) => {
+      item[key] = "NA";
+    });
+    return item;
+  }
+  if (typeof emp === "object") {
+    const name = (emp.name || emp.employee || emp.emp_name || "").trim();
+    if (!name) return null;
+    const item = { name };
+    PPE_KEYS.forEach((key) => {
+      item[key] = emp[key] || "NA";
+    });
+    return item;
+  }
+  return null;
+};
+
+const normalizeEmployeesList = (employees) => {
+  if (!Array.isArray(employees)) return [];
+  return employees.map(normalizeEmployee).filter(Boolean);
+};
+
+const formatRecord = (record) => {
+  if (!record) return record;
+  const json = record.toJSON ? record.toJSON() : { ...record };
+  if (json.employees) {
+    json.employees = normalizeEmployeesList(parseJsonArray(json.employees));
+  }
+  return json;
+};
+
 // Create a new tool box tackle with action items
 const create = async (req, res) => {
   try {
@@ -82,11 +131,12 @@ const create = async (req, res) => {
       employee_group_photo = uploadResult.url;
     }
 
-    const parsedEmployees = Array.isArray(employees)
+    const rawEmployees = Array.isArray(employees)
       ? employees
       : Array.isArray(employes)
         ? employes
         : parseJsonArray(employees, parseJsonArray(employes, []));
+    const parsedEmployees = normalizeEmployeesList(rawEmployees);
 
     const parsedActionItems = parseJsonArray(action_items, []);
 
@@ -144,7 +194,7 @@ const create = async (req, res) => {
 
     return res.status(201).json({
       message: "Tool Box Tackle created successfully",
-      data: result,
+      data: formatRecord(result),
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -173,7 +223,7 @@ const getMyRecords = async (req, res) => {
 
     return res.status(200).json({
       message: "Tool Box Tackles fetched successfully",
-      data: records,
+      data: records.map(formatRecord),
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -200,7 +250,7 @@ const getAll = async (req, res) => {
 
     return res.status(200).json({
       message: "All Tool Box Tackles fetched successfully",
-      data: records,
+      data: records.map(formatRecord),
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -237,7 +287,7 @@ const getById = async (req, res) => {
 
     return res.status(200).json({
       message: "Tool Box Tackle fetched successfully",
-      data: record,
+      data: formatRecord(record),
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -299,11 +349,12 @@ const update = async (req, res) => {
       employee_group_photo = uploadResult.url;
     }
 
-    const parsedEmployees = Array.isArray(employees)
+    const rawEmployees = Array.isArray(employees)
       ? employees
       : Array.isArray(employes)
         ? employes
         : parseJsonArray(employees, parseJsonArray(employes, record.employees));
+    const parsedEmployees = normalizeEmployeesList(rawEmployees);
 
     const parsedActionItems = parseJsonArray(action_items, []);
 
@@ -387,7 +438,7 @@ const update = async (req, res) => {
 
     return res.status(200).json({
       message: "Tool Box Tackle updated successfully",
-      data: result,
+      data: formatRecord(result),
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });

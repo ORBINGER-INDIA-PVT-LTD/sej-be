@@ -86,7 +86,8 @@ const ToolBoxTackleModel = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: true,
       },
-      // Array of strings (stored as JSON in MySQL)
+      // Array of employee objects with PPE status (stored as JSON in MySQL)
+      // e.g. [{ name: "EMP - John", helmet: "OK", safety_goggles: "OK", nose_mask: "NA", hand_gloves: "OK", fr_jacket: "NA", safety_shoes: "OK", full_body_harness: "NA", physical_fit_for_duty: "OK", calibration_co_detector: "NA" }]
       employees: {
         type: DataTypes.JSON,
         allowNull: false,
