@@ -7,7 +7,7 @@ export const authenticate = async (req, res, next) => {
   if (!token) return res.status(401).json({ message: "No token provided" });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET, { ignoreExpiration: true });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded; // { id, role, org_id, VendorCode }
 
     if (req.user && req.user.role) {
@@ -40,6 +40,12 @@ export const authenticate = async (req, res, next) => {
 
     next();
   } catch (err) {
-    return res.status(401).json({ message: err.name === "JsonWebTokenError" || err.name === "TokenExpiredError" ? "Invalid token" : err.message });
+    const isExpired = err.name === "TokenExpiredError";
+    const message = isExpired
+      ? "Token expired"
+      : err.name === "JsonWebTokenError"
+        ? "Invalid token"
+        : err.message;
+    return res.status(401).json({ message, expired: isExpired });
   }
 };
