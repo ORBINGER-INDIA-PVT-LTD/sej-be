@@ -25,6 +25,22 @@ app.get("/", (req, res) => {
   res.json({ message: "Safe execution of job API Running..." });
 });
 
+app.get("/api/proxy-image", async (req, res) => {
+  const imageUrl = req.query.url;
+  if (!imageUrl) return res.status(400).send("No url provided");
+  try {
+    const response = await fetch(imageUrl);
+    if (!response.ok) return res.status(response.status).send("Failed to fetch image");
+    const contentType = response.headers.get("content-type") || "image/jpeg";
+    res.setHeader("Content-Type", contentType);
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    const arrayBuffer = await response.arrayBuffer();
+    res.send(Buffer.from(arrayBuffer));
+  } catch (err) {
+    res.status(500).send("Failed to proxy image");
+  }
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/daily-job-plans", dailyJobPlanRoutes);

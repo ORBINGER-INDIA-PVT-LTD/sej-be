@@ -18,7 +18,7 @@ export const uploadToS3 = async (file, folder = "general") => {
         return {
             status: true,
             key,
-            url: `https://${process.env.S3}.s3.amazonaws.com/${key}`
+            url: `https://${process.env.S3}.s3.${process.env.AWS_RE || 'ap-south-1'}.amazonaws.com/${key}`
         };
     } catch (error) {
         console.log("upload error:", error);

@@ -5,6 +5,7 @@ import sharp from "sharp";
 const ToolBoxTackle = db.ToolBoxTackle;
 const ToolBoxTackleAction = db.ToolBoxTackleAction;
 const User = db.User;
+const Organization = db.Organization;
 
 const FOLDER = "uploads";
 
@@ -189,6 +190,11 @@ const create = async (req, res) => {
           as: "employee",
           attributes: ["id", "emp_id", "emp_name", "email"],
         },
+        {
+          model: Organization,
+          as: "organization",
+          attributes: ["id", "OrgName", "OrgLogo", "VendorCode"],
+        },
       ],
     });
 
@@ -217,6 +223,11 @@ const getMyRecords = async (req, res) => {
           as: "employee",
           attributes: ["id", "emp_id", "emp_name", "email"],
         },
+        {
+          model: Organization,
+          as: "organization",
+          attributes: ["id", "OrgName", "OrgLogo", "VendorCode"],
+        },
       ],
       order: [["date", "DESC"]],
     });
@@ -243,6 +254,11 @@ const getAll = async (req, res) => {
           model: User,
           as: "employee",
           attributes: ["id", "emp_id", "emp_name", "email"],
+        },
+        {
+          model: Organization,
+          as: "organization",
+          attributes: ["id", "OrgName", "OrgLogo", "VendorCode"],
         },
       ],
       order: [["date", "DESC"]],
@@ -271,6 +287,11 @@ const getById = async (req, res) => {
           model: User,
           as: "employee",
           attributes: ["id", "emp_id", "emp_name", "email"],
+        },
+        {
+          model: Organization,
+          as: "organization",
+          attributes: ["id", "OrgName", "OrgLogo", "VendorCode"],
         },
       ],
     });
