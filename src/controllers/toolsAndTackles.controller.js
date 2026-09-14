@@ -109,6 +109,7 @@ const create = async (req, res) => {
         return {
           tools_and_tackles_id: record.id,
           tool_name: tool.toolName || tool.tool_name || "Unknown Tool",
+          tool_type: tool.toolType || tool.tool_type || "Machine Tool",
           plant: tool.plant || "All",
           location: toolLocs,
           tool_status: "Pending", // Default overall status
@@ -329,6 +330,7 @@ const update = async (req, res) => {
         return {
           tools_and_tackles_id: id,
           tool_name: tool.toolName || tool.tool_name || "Unknown Tool",
+          tool_type: tool.toolType || tool.tool_type || "Machine Tool",
           plant: tool.plant || "All",
           location: toolLocs,
           tool_status: "Pending",
