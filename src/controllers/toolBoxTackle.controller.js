@@ -11,7 +11,7 @@ const FOLDER = "uploads";
 
 // Helper to get VendorCode from request
 const getVendorCode = (req) =>
-  req.user?.VendorCode || req.query.VendorCode || req.body.VendorCode || null;
+  req.user?.VendorCode || req.query?.VendorCode || req.body?.VendorCode || null;
 
 const parseJsonArray = (value, fallback = []) => {
   if (value == null) return fallback;

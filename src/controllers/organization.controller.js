@@ -214,8 +214,8 @@ export const updateOrganization = async (req, res) => {
 
 export const getOrganizationProfile = async (req, res) => {
   try {
-    const VendorCode = req.user?.VendorCode || req.query.VendorCode || req.body.VendorCode || null;
-    const orgId = req.query.org_id || req.body.org_id || req.user?.org_id || null;
+    const VendorCode = req.user?.VendorCode || req.query?.VendorCode || req.body?.VendorCode || null;
+    const orgId = req.query?.org_id || req.body?.org_id || req.user?.org_id || null;
     let org = null;
     if (VendorCode) {
       org = await Organization.findOne({ where: { VendorCode } });

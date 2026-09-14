@@ -6,7 +6,7 @@ const User = db.User;
 
 // Helper to get VendorCode from request
 const getVendorCode = (req) =>
-  req.user?.VendorCode || req.query.VendorCode || req.body.VendorCode || null;
+  req.user?.VendorCode || req.query?.VendorCode || req.body?.VendorCode || null;
 
 // Create new ToolsList entry
 const create = async (req, res) => {

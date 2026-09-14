@@ -45,6 +45,10 @@ const ToolsAndTacklesModel = (sequelize, DataTypes) => {
         allowNull: true,
         defaultValue: "Pending",
       },
+      location: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,

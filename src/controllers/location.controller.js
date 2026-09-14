@@ -4,7 +4,7 @@ const Location = db.Location;
 
 // Helper to get VendorCode from request
 const getVendorCode = (req) =>
-  req.user?.VendorCode || req.query.VendorCode || req.body.VendorCode || null;
+  req.user?.VendorCode || req.query?.VendorCode || req.body?.VendorCode || null;
 
 // Generate a unique 4-digit LocationId
 const generateLocationId = async (VendorCode) => {
@@ -59,10 +59,17 @@ const getAll = async (req, res) => {
   try {
     const VendorCode = getVendorCode(req);
     const whereClause = VendorCode ? { VendorCode } : {};
-    const records = await Location.findAll({
+    let records = await Location.findAll({
       where: whereClause,
-      order: [["createdAt", "DESC"]],
+      order: [["LocationName", "ASC"]],
     });
+
+    // If no locations found for this VendorCode, fallback to all locations so dropdowns don't stay empty
+    if (records.length === 0 && VendorCode) {
+      records = await Location.findAll({
+        order: [["LocationName", "ASC"]],
+      });
+    }
 
     return res.status(200).json({
       message: "Locations fetched successfully",

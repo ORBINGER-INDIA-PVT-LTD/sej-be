@@ -9,7 +9,7 @@ const FOLDER = "uploads"; // S3 folder name for uploaded images
 
 // Helper to get VendorCode from request
 const getVendorCode = (req) =>
-  req.user?.VendorCode || req.query.VendorCode || req.body.VendorCode || null;
+  req.user?.VendorCode || req.query?.VendorCode || req.body?.VendorCode || null;
 
 // Helper: safely parse a JSON array from form-data string or return []
 const parseJsonArray = (value) => {

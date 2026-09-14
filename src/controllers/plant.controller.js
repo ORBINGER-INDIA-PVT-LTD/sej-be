@@ -4,7 +4,7 @@ const Plant = db.Plant;
 
 // Helper to get VendorCode from request
 const getVendorCode = (req) =>
-  req.user?.VendorCode || req.query.VendorCode || req.body.VendorCode || null;
+  req.user?.VendorCode || req.query?.VendorCode || req.body?.VendorCode || null;
 
 // Generate a unique 4-digit PlantId
 const generatePlantId = async (VendorCode) => {
@@ -59,10 +59,17 @@ const getAll = async (req, res) => {
   try {
     const VendorCode = getVendorCode(req);
     const whereClause = VendorCode ? { VendorCode } : {};
-    const records = await Plant.findAll({
+    let records = await Plant.findAll({
       where: whereClause,
-      order: [["createdAt", "DESC"]],
+      order: [["PlantName", "ASC"]],
     });
+
+    // If no plants found for this VendorCode, fallback to all plants
+    if (records.length === 0 && VendorCode) {
+      records = await Plant.findAll({
+        order: [["PlantName", "ASC"]],
+      });
+    }
 
     return res.status(200).json({
       message: "Plants fetched successfully",
