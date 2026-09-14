@@ -20,10 +20,13 @@ const create = async (req, res) => {
       jobDescription, 
       location,
       tools,
-      employeeId
+      employeeId,
+      tool_type,
+      toolType
     } = req.body;
     const user_id = req.user.id;
     const VendorCode = getVendorCode(req);
+    const selectedToolType = tool_type || toolType || null;
 
     // Create parent record
     const record = await ToolsList.create({
@@ -36,6 +39,7 @@ const create = async (req, res) => {
       sop_number: sopNumber,
       job_description: jobDescription,
       location,
+      tool_type: selectedToolType,
       org_id: req.user?.org_id || 1,
       VendorCode,
     });
@@ -55,8 +59,9 @@ const create = async (req, res) => {
     if (parsedTools && parsedTools.length > 0) {
       const items = parsedTools.map((t) => ({
         tools_list_id: record.id,
-        tool_name: t.toolName || "Unknown Tool",
-        checklist_points: t.checklistPoints || [],
+        tool_name: t.toolName || t.tool_name || "Unknown Tool",
+        tool_type: t.toolType || t.tool_type || selectedToolType || null,
+        checklist_points: t.checklistPoints || t.checklist_points || [],
         other: t.other || "",
         description: t.description || "",
         status: t.status || "",
@@ -221,7 +226,9 @@ const update = async (req, res) => {
       jobDescription, 
       location,
       tools,
-      employeeId
+      employeeId,
+      tool_type,
+      toolType
     } = req.body;
     const user_id = req.user.id;
     const userRole = req.user.roleName || "";
@@ -236,6 +243,8 @@ const update = async (req, res) => {
       return res.status(403).json({ message: "Access denied" });
     }
 
+    const selectedToolType = tool_type || toolType || record.tool_type || null;
+
     await record.update({
       employee_id: employeeId,
       permit_number: permitNumber,
@@ -245,6 +254,7 @@ const update = async (req, res) => {
       sop_number: sopNumber,
       job_description: jobDescription,
       location,
+      tool_type: selectedToolType,
       updatedAt: new Date()
     });
 
@@ -267,6 +277,7 @@ const update = async (req, res) => {
       const items = parsedTools.map((t) => ({
         tools_list_id: id,
         tool_name: t.toolName || t.tool_name || "Unknown Tool",
+        tool_type: t.toolType || t.tool_type || selectedToolType || null,
         checklist_points: t.checklistPoints || t.checklist_points || [],
         other: t.other || "",
         description: t.description || "",

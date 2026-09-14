@@ -15,6 +15,10 @@ const ToolsListItemModel = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      tool_type: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       checklist_points: {
         type: DataTypes.JSON,
         allowNull: true,
