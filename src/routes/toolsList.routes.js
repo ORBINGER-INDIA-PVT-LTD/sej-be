@@ -3,6 +3,8 @@ import toolsListController from "../controllers/toolsList.controller.js";
 import { authenticate } from "../middlewares/authenticate.js";
 import { authorize } from "../middlewares/authorize.js";
 
+import { uploadToolsAfterReportPhoto } from "../middlewares/multer.middleware.js";
+
 const router = express.Router();
 
 // Require auth
@@ -29,7 +31,12 @@ router.put("/:id", authorize("employee", "admin"), toolsListController.update);
 // Delete single record
 router.delete("/:id", authorize("employee", "admin"), toolsListController.remove);
 
-// Update single item after-report
-router.put("/item/:itemId/after-report", authorize("employee", "admin"), toolsListController.updateItemAfterReport);
+// Update single item after-report (supports multipart form-data for photo upload or JSON)
+router.put(
+  "/item/:itemId/after-report",
+  authorize("employee", "admin"),
+  uploadToolsAfterReportPhoto,
+  toolsListController.updateItemAfterReport
+);
 
 export default router;

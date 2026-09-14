@@ -1,4 +1,5 @@
 import db from "../models/index.js";
+import { uploadToS3 } from "../services/upload.service.js";
 
 const ToolsList = db.ToolsList;
 const ToolsListItem = db.ToolsListItem;
@@ -66,7 +67,8 @@ const create = async (req, res) => {
         description: t.description || "",
         status: t.status || "",
         after_report: t.afterReport || t.after_report || null,
-        after_report_date: t.afterReportDate || t.after_report_date || null
+        after_report_date: t.afterReportDate || t.after_report_date || null,
+        after_report_photo: t.afterReportPhoto || t.after_report_photo || null
       }));
 
       await ToolsListItem.bulkCreate(items);
@@ -283,7 +285,8 @@ const update = async (req, res) => {
         description: t.description || "",
         status: t.status || "",
         after_report: t.afterReport || t.after_report || null,
-        after_report_date: t.afterReportDate || t.after_report_date || null
+        after_report_date: t.afterReportDate || t.after_report_date || null,
+        after_report_photo: t.afterReportPhoto || t.after_report_photo || null
       }));
 
       await ToolsListItem.bulkCreate(items);
@@ -324,7 +327,7 @@ const remove = async (req, res) => {
   }
 };
 
-// Update a single item's after_report
+// Update a single item's after_report (supports text, date, and photo attachment)
 const updateItemAfterReport = async (req, res) => {
   try {
     const { itemId } = req.params;
@@ -335,9 +338,22 @@ const updateItemAfterReport = async (req, res) => {
       return res.status(404).json({ message: "Item not found" });
     }
 
+    let photoUrl = req.body.afterReportPhoto || req.body.after_report_photo || item.after_report_photo || null;
+    const file = req.file || (req.files && req.files[0]);
+    if (file) {
+      const uploadResult = await uploadToS3(file, "tools_after_reports");
+      if (uploadResult && uploadResult.status) {
+        photoUrl = uploadResult.url;
+      } else {
+        // Fallback to data URI if S3 upload fails so photo is never lost
+        photoUrl = `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
+      }
+    }
+
     await item.update({
       after_report: afterReport,
       after_report_date: afterReportDate,
+      after_report_photo: photoUrl,
     });
 
     return res.status(200).json({ message: "After report updated successfully", data: item });

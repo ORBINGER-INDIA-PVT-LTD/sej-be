@@ -41,3 +41,10 @@ export const uploadToolBoxTackleGroupPhoto = multer({
   storage,
   fileFilter,
 }).single("employee_group_photo");
+
+// For tools inspection item: after report photo upload
+export const uploadToolsAfterReportPhoto = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 mb
+}).any();
