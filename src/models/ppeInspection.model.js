@@ -17,7 +17,7 @@ const PpeInspectionModel = (sequelize, DataTypes) => {
       },
       permit_number: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       date: {
         type: DataTypes.DATEONLY,

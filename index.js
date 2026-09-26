@@ -49,11 +49,32 @@ const seedDatabase = async () => {
   }
 };
 
+// Ensure optional permit_number columns accept NULL (heals legacy NOT NULL schemas
+// created before the models were changed to allowNull: true). Safe to run on every boot.
+const ensureNullablePermitColumns = async () => {
+  const fixes = [
+    "ALTER TABLE ppe_inspections MODIFY COLUMN permit_number VARCHAR(255) NULL",
+    "ALTER TABLE tools_lists MODIFY COLUMN permit_number VARCHAR(255) NULL",
+  ];
+  for (const sql of fixes) {
+    try {
+      await db.sequelize.query(sql);
+    } catch (err) {
+      // Ignore if already nullable or table missing; log anything else
+      if (!/already|duplicate|doesn't exist|unknown/i.test(err.message)) {
+        console.log(`ℹ️ Schema check (${sql.split(" ")[2]}): ${err.message}`);
+      }
+    }
+  }
+};
+
 // Connect to database and sync tables, then start server
 const startServer = async () => {
   try {
     await db.sequelize.authenticate();
     console.log("==Database connected successfully==");
+
+    await ensureNullablePermitColumns();
 
     // Sync all models only if DB_SYNC is set to true (saves 10-20 seconds on startup)
     if (process.env.DB_SYNC === "true") {

@@ -9,6 +9,16 @@ const User = db.User;
 const getVendorCode = (req) =>
   req.user?.VendorCode || req.query?.VendorCode || req.body?.VendorCode || null;
 
+// Normalize optional string fields: undefined = not provided, null/'' = NULL, else trimmed value.
+// This keeps inserts/updates safe whether the DB column is NULL-able or legacy NOT NULL
+// (empty string passes NOT NULL while NULL is stored when the column allows it).
+const toNullable = (v) => {
+  if (v === undefined) return undefined;
+  if (v === null) return null;
+  if (typeof v === "string" && v.trim() === "") return null;
+  return v;
+};
+
 // Helper to include nested associations cleanly
 const getNestedIncludes = () => [
   { model: User, as: "user", attributes: ["id", "emp_name", "email", "location"] },
@@ -38,15 +48,15 @@ const create = async (req, res) => {
     const user_id = req.user.id;
     const VendorCode = getVendorCode(req);
 
-    // Create parent permit record
+    // Create parent permit record (permit_number is optional: null/'' -> NULL)
     const record = await PpeInspection.create({
       user_id,
-      permit_number: permitNumber,
+      permit_number: toNullable(permitNumber) ?? null,
       date,
-      type_of_work: typeOfWork,
+      type_of_work: toNullable(typeOfWork) ?? null,
       name_of_supervisor: nameOfSupervisor,
-      sop_number: sopNumber,
-      job_description: jobDescription,
+      sop_number: toNullable(sopNumber) ?? null,
+      job_description: toNullable(jobDescription) ?? null,
       location,
       org_id: req.user?.org_id || 1,
       VendorCode,
@@ -244,12 +254,12 @@ const update = async (req, res) => {
     }
 
     await record.update({
-      permit_number: permitNumber,
+      permit_number: toNullable(permitNumber) !== undefined ? toNullable(permitNumber) : record.permit_number,
       date,
-      type_of_work: typeOfWork,
+      type_of_work: toNullable(typeOfWork) !== undefined ? toNullable(typeOfWork) : record.type_of_work,
       name_of_supervisor: nameOfSupervisor,
-      sop_number: sopNumber,
-      job_description: jobDescription,
+      sop_number: toNullable(sopNumber) !== undefined ? toNullable(sopNumber) : record.sop_number,
+      job_description: toNullable(jobDescription) !== undefined ? toNullable(jobDescription) : record.job_description,
       location,
       updatedAt: new Date(),
     });

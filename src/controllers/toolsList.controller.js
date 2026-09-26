@@ -9,6 +9,14 @@ const User = db.User;
 const getVendorCode = (req) =>
   req.user?.VendorCode || req.query?.VendorCode || req.body?.VendorCode || null;
 
+// Normalize optional string fields: undefined = not provided, null/'' = NULL, else value.
+const toNullable = (v) => {
+  if (v === undefined) return undefined;
+  if (v === null) return null;
+  if (typeof v === "string" && v.trim() === "") return null;
+  return v;
+};
+
 // Create new ToolsList entry
 const create = async (req, res) => {
   try {
@@ -29,16 +37,16 @@ const create = async (req, res) => {
     const VendorCode = getVendorCode(req);
     const selectedToolType = tool_type || toolType || null;
 
-    // Create parent record
+    // Create parent record (permit_number is optional: null/'' -> NULL)
     const record = await ToolsList.create({
       user_id,
       employee_id: employeeId,
-      permit_number: permitNumber,
+      permit_number: toNullable(permitNumber) ?? null,
       date,
-      type_of_work: typeOfWork,
+      type_of_work: toNullable(typeOfWork) ?? null,
       name_of_supervisor: nameOfSupervisor,
-      sop_number: sopNumber,
-      job_description: jobDescription,
+      sop_number: toNullable(sopNumber) ?? null,
+      job_description: toNullable(jobDescription) ?? null,
       location,
       tool_type: selectedToolType,
       org_id: req.user?.org_id || 1,
@@ -249,12 +257,12 @@ const update = async (req, res) => {
 
     await record.update({
       employee_id: employeeId,
-      permit_number: permitNumber,
+      permit_number: toNullable(permitNumber) !== undefined ? toNullable(permitNumber) : record.permit_number,
       date,
-      type_of_work: typeOfWork,
+      type_of_work: toNullable(typeOfWork) !== undefined ? toNullable(typeOfWork) : record.type_of_work,
       name_of_supervisor: nameOfSupervisor,
-      sop_number: sopNumber,
-      job_description: jobDescription,
+      sop_number: toNullable(sopNumber) !== undefined ? toNullable(sopNumber) : record.sop_number,
+      job_description: toNullable(jobDescription) !== undefined ? toNullable(jobDescription) : record.job_description,
       location,
       tool_type: selectedToolType,
       updatedAt: new Date()
