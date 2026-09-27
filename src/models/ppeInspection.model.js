@@ -43,6 +43,10 @@ const PpeInspectionModel = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      shift: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       org_id: {
         type: DataTypes.INTEGER,
         allowNull: true,

@@ -24,11 +24,26 @@ async function run() {
       console.log("after_report_date might already exist or failed:", e.message);
     }
 
+    // Add shift columns to inspection tables
+    console.log("Adding shift columns...");
+    try {
+      await db.sequelize.query("ALTER TABLE ppe_inspections ADD COLUMN shift VARCHAR(255) NULL");
+      console.log("Added shift to ppe_inspections");
+    } catch (e) {
+      console.log("shift might already exist in ppe_inspections:", e.message);
+    }
+
+    try {
+      await db.sequelize.query("ALTER TABLE tools_lists ADD COLUMN shift VARCHAR(255) NULL");
+      console.log("Added shift to tools_lists");
+    } catch (e) {
+      console.log("shift might already exist in tools_lists:", e.message);
+    }
+
     // Drop columns from tools_lists if they exist
     console.log("Dropping legacy columns from tools_lists...");
     try {
-      await db.sequelize.query("ALTER TABLE tools_lists DROP COLUMN after_report");
-      console.log("Dropped after_report from tools_lists");
+      await db.sequelize.query("ALTER TABLE tools_lists DROP COLUMN after_report");      console.log("Dropped after_report from tools_lists");
     } catch (e) {
       console.log("No after_report column in tools_lists to drop:", e.message);
     }

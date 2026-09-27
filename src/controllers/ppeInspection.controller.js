@@ -43,6 +43,7 @@ const create = async (req, res) => {
       sopNumber,
       jobDescription,
       location,
+      shift,
       employees, // structured list: [ { employeeId, items: [...] } ]
     } = req.body;
     const user_id = req.user.id;
@@ -58,6 +59,7 @@ const create = async (req, res) => {
       sop_number: toNullable(sopNumber) ?? null,
       job_description: toNullable(jobDescription) ?? null,
       location,
+      shift: toNullable(shift) ?? null,
       org_id: req.user?.org_id || 1,
       VendorCode,
     });
@@ -238,6 +240,7 @@ const update = async (req, res) => {
       sopNumber,
       jobDescription,
       location,
+      shift,
       employees,
     } = req.body;
     const user_id = req.user.id;
@@ -261,6 +264,7 @@ const update = async (req, res) => {
       sop_number: toNullable(sopNumber) !== undefined ? toNullable(sopNumber) : record.sop_number,
       job_description: toNullable(jobDescription) !== undefined ? toNullable(jobDescription) : record.job_description,
       location,
+      shift: toNullable(shift) !== undefined ? toNullable(shift) : record.shift,
       updatedAt: new Date(),
     });
 

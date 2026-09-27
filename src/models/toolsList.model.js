@@ -47,6 +47,10 @@ const ToolsListModel = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      shift: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       tool_type: {
         type: DataTypes.STRING,
         allowNull: true,

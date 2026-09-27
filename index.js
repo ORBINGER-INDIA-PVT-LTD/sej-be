@@ -55,12 +55,14 @@ const ensureNullablePermitColumns = async () => {
   const fixes = [
     "ALTER TABLE ppe_inspections MODIFY COLUMN permit_number VARCHAR(255) NULL",
     "ALTER TABLE tools_lists MODIFY COLUMN permit_number VARCHAR(255) NULL",
+    "ALTER TABLE ppe_inspections ADD COLUMN shift VARCHAR(255) NULL",
+    "ALTER TABLE tools_lists ADD COLUMN shift VARCHAR(255) NULL",
   ];
   for (const sql of fixes) {
     try {
       await db.sequelize.query(sql);
     } catch (err) {
-      // Ignore if already nullable or table missing; log anything else
+      // Ignore if already nullable / column exists or table missing; log anything else
       if (!/already|duplicate|doesn't exist|unknown/i.test(err.message)) {
         console.log(`ℹ️ Schema check (${sql.split(" ")[2]}): ${err.message}`);
       }

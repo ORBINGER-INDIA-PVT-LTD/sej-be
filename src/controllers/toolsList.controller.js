@@ -28,6 +28,7 @@ const create = async (req, res) => {
       sopNumber, 
       jobDescription, 
       location,
+      shift,
       tools,
       employeeId,
       tool_type,
@@ -48,6 +49,7 @@ const create = async (req, res) => {
       sop_number: toNullable(sopNumber) ?? null,
       job_description: toNullable(jobDescription) ?? null,
       location,
+      shift: toNullable(shift) ?? null,
       tool_type: selectedToolType,
       org_id: req.user?.org_id || 1,
       VendorCode,
@@ -235,6 +237,7 @@ const update = async (req, res) => {
       sopNumber, 
       jobDescription, 
       location,
+      shift,
       tools,
       employeeId,
       tool_type,
@@ -264,6 +267,7 @@ const update = async (req, res) => {
       sop_number: toNullable(sopNumber) !== undefined ? toNullable(sopNumber) : record.sop_number,
       job_description: toNullable(jobDescription) !== undefined ? toNullable(jobDescription) : record.job_description,
       location,
+      shift: toNullable(shift) !== undefined ? toNullable(shift) : record.shift,
       tool_type: selectedToolType,
       updatedAt: new Date()
     });
