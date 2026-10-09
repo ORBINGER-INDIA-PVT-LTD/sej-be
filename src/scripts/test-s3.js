@@ -9,10 +9,10 @@ const __dirname = path.dirname(__filename);
 // Load environment variables from .env
 dotenv.config({ path: path.join(__dirname, "../../.env") });
 
-const bucket = process.env.S3;
-const region = process.env.AWS_RE;
-const accessKey = process.env.AWS_ACC_KEY;
-const secretKey = process.env.AWS_S_KEY;
+const bucket = process.env.S3_BUCKET || process.env.S3;
+const region = process.env.AWS_REGION || process.env.AWS_RE;
+const accessKey = process.env.AWS_ACCESS_KEY_ID || process.env.AWS_ACC_KEY;
+const secretKey = process.env.AWS_SECRET_ACCESS_KEY || process.env.AWS_S_KEY;
 
 async function runDiagnostics() {
   console.log("==================================================");
@@ -103,7 +103,7 @@ function handleS3Error(err) {
   } else if (err.name === "PermanentRedirect" || err.$metadata?.httpStatusCode === 301) {
     console.log("\n💡 RECOMMENDATION:");
     console.log("This is an AWS Region mismatch.");
-    console.log(`Check your .env and set 'AWS_RE' to the correct bucket region (e.g. Stockholm is 'eu-north-1', Mumbai is 'ap-south-1').`);
+    console.log(`Check your .env and set 'AWS_REGION' to the correct bucket region (e.g. Stockholm is 'eu-north-1', Mumbai is 'ap-south-1').`);
     if (err.Endpoint) {
       console.log(`Suggested Endpoint from AWS: ${err.Endpoint}`);
     }

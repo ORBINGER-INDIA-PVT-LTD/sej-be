@@ -1,5 +1,5 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3"
-import { s3 } from "../config/awsS3.js"
+import { s3, S3_BUCKET, buildS3Url } from "../config/awsS3.js"
 import { v4 as uuid } from "uuid"
 
 export const uploadToS3 = async (file, folder = "general") => {
@@ -7,7 +7,7 @@ export const uploadToS3 = async (file, folder = "general") => {
         const key = `${folder}/${uuid()}-${file.originalname}`;
 
         const command = new PutObjectCommand({
-            Bucket: process.env.S3,
+            Bucket: S3_BUCKET,
             Key: key,
             Body: file.buffer,
             ContentType: file.mimetype
@@ -18,7 +18,7 @@ export const uploadToS3 = async (file, folder = "general") => {
         return {
             status: true,
             key,
-            url: `https://${process.env.S3}.s3.${process.env.AWS_RE || 'ap-south-1'}.amazonaws.com/${key}`
+            url: buildS3Url(key)
         };
     } catch (error) {
         console.log("upload error:", error);
