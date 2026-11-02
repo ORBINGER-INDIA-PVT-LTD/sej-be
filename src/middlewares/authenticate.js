@@ -21,11 +21,6 @@ export const authenticate = async (req, res, next) => {
       req.user.roleName = "employee";
     }
 
-    // Resolve VendorCode — from token, fallback to query/body param
-    if (!req.user.VendorCode) {
-      req.user.VendorCode = req.query.VendorCode || req.body?.VendorCode || null;
-    }
-
     // If still no VendorCode and this is an employee, fetch from DB
     if (!req.user.VendorCode && req.user.id && req.user.roleName !== "organization") {
       const userRecord = await db.User.findByPk(req.user.id, { attributes: ["VendorCode", "org_id"] });

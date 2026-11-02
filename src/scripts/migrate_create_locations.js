@@ -18,13 +18,14 @@ async function run() {
   await sequelize.query(`
     CREATE TABLE IF NOT EXISTS \`locations\` (
       \`id\` INT NOT NULL AUTO_INCREMENT,
-      \`LocationId\` VARCHAR(10) NOT NULL UNIQUE,
+      \`LocationId\` VARCHAR(10) NOT NULL,
       \`LocationName\` VARCHAR(255) NOT NULL,
       \`VendorCode\` VARCHAR(255) NULL,
       \`org_id\` INT NULL,
       \`createdAt\` DATETIME NOT NULL,
       \`updatedAt\` DATETIME NOT NULL,
-      PRIMARY KEY (\`id\`)
+      PRIMARY KEY (\`id\`),
+      UNIQUE KEY \`uq_locations_vendor_LocationId\` (\`VendorCode\`, \`LocationId\`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
   `);
   console.log("  ✅ locations table created");

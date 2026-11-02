@@ -27,6 +27,7 @@ const LocationModel = (sequelize, DataTypes) => {
     {
       timestamps: true,
       tableName: "locations",
+      indexes: [{ name: "uq_locations_vendor_LocationId", unique: true, fields: ["VendorCode", "LocationId"] }],
     }
   );
 

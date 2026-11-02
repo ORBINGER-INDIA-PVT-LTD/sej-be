@@ -52,7 +52,7 @@ export const getDashboardKPIs = async (req, res) => {
       recentTools,
       recentPPE,
     ] = await Promise.all([
-      db.Employee.count({ where: monthWhereCreatedAt }),
+      db.Employee.count({ where: recentWhere }),
       db.ToolBoxTackle.findAll({ where: monthWhereDate, attributes: ['date'] }),
       db.DailyJobPlan.findAll({ where: monthWhereDate, attributes: ['date'] }),
       db.ToolsList.findAll({ where: monthWhereDate, attributes: ['date'] }),

@@ -27,6 +27,7 @@ const PlantModel = (sequelize, DataTypes) => {
     {
       timestamps: true,
       tableName: "plants",
+      indexes: [{ name: "uq_plants_vendor_PlantId", unique: true, fields: ["VendorCode", "PlantId"] }],
     }
   );
 
